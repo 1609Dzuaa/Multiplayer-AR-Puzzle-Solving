@@ -148,8 +148,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 49.665016, y: -25}
-  m_SizeDelta: {x: 99.33, y: 50}
+  m_AnchoredPosition: {x: 52.795, y: -25}
+  m_SizeDelta: {x: 105.59, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5066562195650241025
 CanvasRenderer:
@@ -179,7 +179,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Press
+  m_text: Touch
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 561b17b1e2e773d4dbdf4095f3b05cca, type: 2}
   m_sharedMaterial: {fileID: -2309229355612886919, guid: 561b17b1e2e773d4dbdf4095f3b05cca,
@@ -494,8 +494,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 210.975, y: -25}
-  m_SizeDelta: {x: 173.29, y: 55}
+  m_AnchoredPosition: {x: 235.91, y: -25}
+  m_SizeDelta: {x: 210.64, y: 55}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5066562196260887061
 CanvasRenderer:
@@ -628,7 +628,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 401.825, y: -25}
+  m_AnchoredPosition: {x: 445.435, y: -25}
   m_SizeDelta: {x: 158.41, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5066562196431413980
@@ -826,8 +826,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 86.645, y: -27.5}
-  m_SizeDelta: {x: 137.29, y: 55}
+  m_AnchoredPosition: {x: 105.32, y: -27.5}
+  m_SizeDelta: {x: 174.64, y: 55}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5066562196500151907
 CanvasRenderer:
@@ -857,7 +857,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Any Key
+  m_text: Anywhere
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 561b17b1e2e773d4dbdf4095f3b05cca, type: 2}
   m_sharedMaterial: {fileID: -2309229355612886919, guid: 561b17b1e2e773d4dbdf4095f3b05cca,
