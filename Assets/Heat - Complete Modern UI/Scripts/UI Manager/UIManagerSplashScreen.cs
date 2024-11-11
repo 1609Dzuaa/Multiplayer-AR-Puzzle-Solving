@@ -153,8 +153,9 @@ namespace Michsky.UI.Heat
             if (UIManagerAsset.pakType == UIManager.PressAnyKeyTextType.Custom)
                 return;
 
-            if (UIManagerAsset.pakType == UIManager.PressAnyKeyTextType.Default && UIManagerAsset.enableLocalization == false) { AnalyzePAKText(); }
+            /*(if (UIManagerAsset.pakType == UIManager.PressAnyKeyTextType.Default && UIManagerAsset.enableLocalization == false) { AnalyzePAKText(); }
             else if (UIManagerAsset.pakType == UIManager.PressAnyKeyTextType.Default && UIManagerAsset.enableLocalization == true) { AnalyzePAKLocalizationText(); }
+            */
         }
     }
 }
