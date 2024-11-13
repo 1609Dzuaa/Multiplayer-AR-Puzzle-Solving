@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR;
 using UnityEngine.XR.ARFoundation;
+using static GameEnums;
 
 [RequireComponent(typeof(ARTrackedImageManager))]
 public class TrackedImageInfo : MonoBehaviour
@@ -11,11 +12,13 @@ public class TrackedImageInfo : MonoBehaviour
 
     Dictionary<string, GameObject> _spawnPrefabs = new Dictionary<string, GameObject>();
     ARTrackedImageManager _trackedImageManager;
+    bool _allowDisplay;
 
     private void Awake()
     {
-        _trackedImageManager = FindObjectOfType<ARTrackedImageManager>();
-        
+        _trackedImageManager = GetComponent<ARTrackedImageManager>();
+        EventsManager.Instance.Subcribe(EventID.OnPlay, AllowToPlay);
+
         foreach(var prefab in _placeablePrefabs)
         {
             GameObject newPrefab = Instantiate(prefab, Vector3.zero, Quaternion.identity);
@@ -23,6 +26,11 @@ public class TrackedImageInfo : MonoBehaviour
             _spawnPrefabs.Add(prefab.name, newPrefab);
             Debug.Log("name: " + prefab.name);
         }
+    }
+
+    private void OnDestroy()
+    {
+        EventsManager.Instance.Unsubcribe(EventID.OnPlay, AllowToPlay);
     }
 
     private void OnEnable()
@@ -35,8 +43,15 @@ public class TrackedImageInfo : MonoBehaviour
         _trackedImageManager.trackedImagesChanged -= ImageChanged;
     }
 
+    private void AllowToPlay(object obj)
+    {
+        _allowDisplay = true;
+    }
+
     private void ImageChanged(ARTrackedImagesChangedEventArgs eventArgs)
     {
+        if (!_allowDisplay) return;
+
         foreach (ARTrackedImage trackImage in eventArgs.added)
         {
             UpdateImage(trackImage);
