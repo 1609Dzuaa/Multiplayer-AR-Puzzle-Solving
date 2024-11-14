@@ -17,20 +17,14 @@ public class TrackedImageInfo : MonoBehaviour
     private void Awake()
     {
         _trackedImageManager = GetComponent<ARTrackedImageManager>();
-        EventsManager.Instance.Subcribe(EventID.OnPlay, AllowToPlay);
 
         foreach(var prefab in _placeablePrefabs)
         {
             GameObject newPrefab = Instantiate(prefab, Vector3.zero, Quaternion.identity);
             newPrefab.name = prefab.name;
             _spawnPrefabs.Add(prefab.name, newPrefab);
-            Debug.Log("name: " + prefab.name);
+            //Debug.Log("name: " + prefab.name);
         }
-    }
-
-    private void OnDestroy()
-    {
-        EventsManager.Instance.Unsubcribe(EventID.OnPlay, AllowToPlay);
     }
 
     private void OnEnable()
@@ -43,15 +37,8 @@ public class TrackedImageInfo : MonoBehaviour
         _trackedImageManager.trackedImagesChanged -= ImageChanged;
     }
 
-    private void AllowToPlay(object obj)
-    {
-        _allowDisplay = true;
-    }
-
     private void ImageChanged(ARTrackedImagesChangedEventArgs eventArgs)
     {
-        if (!_allowDisplay) return;
-
         foreach (ARTrackedImage trackImage in eventArgs.added)
         {
             UpdateImage(trackImage);
@@ -87,48 +74,4 @@ public class TrackedImageInfo : MonoBehaviour
             }
         }
     }
-
-    //old script
-    /*[SerializeField]
-    ARTrackedImageManager m_TrackedImageManager;
-
-    void OnEnable() => m_TrackedImageManager.trackedImagesChanged += OnChanged;
-
-    void OnDisable() => m_TrackedImageManager.trackedImagesChanged -= OnChanged;
-
-    void OnChanged(ARTrackedImagesChangedEventArgs eventArgs)
-    {
-        foreach (var newImage in eventArgs.added)
-        {
-            // Handle added event
-        }
-
-        foreach (var updatedImage in eventArgs.updated)
-        {
-            // Handle updated event
-        }
-
-        foreach (var removedImage in eventArgs.removed)
-        {
-            // Handle removed event
-        }
-    }
-
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Space))
-            ListAllImages();
-    }
-
-    void ListAllImages()
-    {
-        Debug.Log(
-            $"There are {m_TrackedImageManager.trackables.count} images being tracked.");
-
-        foreach (var trackedImage in m_TrackedImageManager.trackables)
-        {
-            Debug.Log($"Image: {trackedImage.referenceImage.name} is at " +
-                      $"{trackedImage.transform.position}");
-        }
-    }*/
 }

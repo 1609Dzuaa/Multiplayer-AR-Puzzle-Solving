@@ -13,12 +13,6 @@ public class MainMenuButton : MonoBehaviour
     {
         OnDisable();
 
-        /*if (_isFirstOnEnable)
-        {
-            _isFirstOnEnable = false;
-            return;
-        }*/
-
         Sequence sequence = DOTween.Sequence();
 
         for (int i = 0; i < _arrBtn.Length; i++)
