@@ -70,7 +70,7 @@ public class TrackedImageInfo : MonoBehaviour
             if (go.name != name)
             {
                 go.SetActive(false);
-                Debug.Log("active false: " + prefab);
+                Debug.Log("active false, goName, name: " + go.name + ", " + name);
             }
         }
     }
