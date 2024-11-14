@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static GameEnums;
@@ -10,9 +10,11 @@ public class UIManager : BaseSingleton<UIManager>
     [SerializeField] MainMenuButton _mainMenuBtn;
     [SerializeField] Transform _mainMenuUI;
     [SerializeField] Transform _sceneTrans;
-    [SerializeField] float _target;
+    [SerializeField] float _distance;
     [SerializeField] float _duration;
-    [SerializeField] Transform _blockObj;
+
+    [Header("Các main component của AR system, mới vào thì giấu nó đi để tránh bug")]
+    [SerializeField] Transform[] _arrARComponents; //đừng active component "UI" trước các component khác
     Vector3 _initPos = Vector3.zero;
 
     protected override void Awake()
@@ -20,7 +22,7 @@ public class UIManager : BaseSingleton<UIManager>
         base.Awake();
         DontDestroyOnLoad(gameObject);
         _mainMenuBtn.gameObject.SetActive(false);
-        _initPos = _sceneTrans.position;
+        _initPos = _sceneTrans.localPosition;
         EventsManager.Instance.Subcribe(EventID.OnLogoTweenCompleted, TweenButtons);
         EventsManager.Instance.Subcribe(EventID.OnStartGame, StartGame);
     }
@@ -38,16 +40,18 @@ public class UIManager : BaseSingleton<UIManager>
 
     private void StartGame(object obj = null)
     {
-        float targetPos = _initPos.x + _target;
+        float targetPos = _initPos.x + _distance;
 
         _sceneTrans.DOLocalMoveX(targetPos, _duration).OnComplete(() =>
         {
             gameObject.SetActive(false);
-            _blockObj.gameObject.SetActive(false);
-            _sceneTrans.DOLocalMoveX(targetPos + _target, _duration).OnComplete(() => 
+            
+            for (int i = 0; i < _arrARComponents.Length; i++)
+                _arrARComponents[i].gameObject.SetActive(true);
+
+            _sceneTrans.DOLocalMoveX(targetPos + _distance, _duration).OnComplete(() => 
             {
-                _sceneTrans.position = _initPos;
-                EventsManager.Instance.Notify(EventID.OnPlay);
+                _sceneTrans.localPosition = _initPos;
             });
         });
     }

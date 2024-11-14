@@ -8,7 +8,6 @@ public static class GameEnums
     {
         OnLogoTweenCompleted,
         OnStartGame,
-        OnPlay,
 
     }
 }
