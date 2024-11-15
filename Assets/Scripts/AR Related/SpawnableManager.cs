@@ -39,7 +39,7 @@ public class SpawnableManager : MonoBehaviour
                     if (hit.collider.CompareTag("GoldCoin"))
                     {
                         _spawnObject = hit.collider.gameObject;
-                        SpawnPrefab(_hits[0].pose.position);
+                        //SpawnPrefab(_hits[0].pose.position);
                     }
                     else
                     {

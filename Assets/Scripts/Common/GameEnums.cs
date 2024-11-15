@@ -10,4 +10,11 @@ public static class GameEnums
         OnStartGame,
 
     }
+
+    public enum EPopupID
+    {
+        PopupHint = 0,
+        PopupInformation = 1,
+
+    }
 }
