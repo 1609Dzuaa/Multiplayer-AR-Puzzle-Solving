@@ -8,6 +8,7 @@ public static class GameEnums
     {
         OnLogoTweenCompleted,
         OnStartGame,
+        OnReceiveNotiParam,
 
     }
 

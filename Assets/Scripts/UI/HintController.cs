@@ -3,15 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using TMPro;
+using static GameEnums;
 
 public class HintController : PopupController
 {
-    [SerializeField] float _tweenChildComponentDuration;
-    [SerializeField] TextMeshProUGUI _txtHint;
-    [SerializeField] Transform[] _arrBtns;
+    [SerializeField] protected float _tweenChildComponentDuration;
+    [SerializeField] protected TextMeshProUGUI _txtHint;
+    [SerializeField] protected Transform[] _arrBtns;
 
-    private const int BUTTON_NEXT_HINT = 0;
-    private const int BUTTON_RETURN = 1;
+    protected const int BUTTON_LEFT_CLICK = 0;
+    protected const int BUTTON_RIGHT_CLICK = 1;
 
     //override th này để nó đc xử lý trong callback OnComplete bên base
     protected override void TweenChildComponent()
@@ -35,13 +36,22 @@ public class HintController : PopupController
 
     public void OnClick(int index)
     {
-        if (index == BUTTON_NEXT_HINT)
-        {
-
-        }
+        if (index == BUTTON_LEFT_CLICK)
+            ButtonLeftClick();
         else
-        {
+            ButtonRightClick();
+    }
 
-        }
+    protected virtual void ButtonLeftClick()
+    {
+        string content = "Do You Want Next Hint ?";
+        NotificationParam param = new NotificationParam(content);
+        EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
+        UIManager.Instance.TogglePopup(EPopupID.PopupInformation, true);
+    }
+
+    protected virtual void ButtonRightClick()
+    {
+        UIManager.Instance.TogglePopup(EPopupID.PopupHint, false);
     }
 }
