@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using static GameEnums;
@@ -66,11 +66,11 @@ public class UIManager : BaseSingleton<UIManager>
         _sceneTrans.DOLocalMoveX(targetPos, _duration).OnComplete(() =>
         {
             gameObject.SetActive(false);
-            
+
             for (int i = 0; i < _arrARComponents.Length; i++)
                 _arrARComponents[i].gameObject.SetActive(true);
 
-            _sceneTrans.DOLocalMoveX(targetPos + _distance, _duration).OnComplete(() => 
+            _sceneTrans.DOLocalMoveX(targetPos + _distance, _duration).OnComplete(() =>
             {
                 _sceneTrans.localPosition = _initPos;
             });
