@@ -79,6 +79,7 @@ public class UIManager : BaseSingleton<UIManager>
 
     public void TogglePopup(EPopupID id, bool On)
     {
-        _dictPopups[id].gameObject.SetActive(On);
+        //Maybe need to re-order render here
+        _dictPopups[id].gameObject.GetComponent<PopupController>().TweenPopupOff(() => _dictPopups[id].gameObject.SetActive(On));
     }
 }

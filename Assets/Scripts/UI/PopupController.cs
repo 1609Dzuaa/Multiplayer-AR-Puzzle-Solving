@@ -18,7 +18,7 @@ public class PopupController : MonoBehaviour
             return;
         }
 
-        TweenPopup();
+        TweenPopupOn();
     }
 
     protected virtual void ResetComponent()
@@ -26,9 +26,14 @@ public class PopupController : MonoBehaviour
 
     }
 
-    protected void TweenPopup()
+    protected void TweenPopupOn()
     {
         transform.DOScale(1.0f, _popupDuration).OnComplete(TweenChildComponent);
+    }
+
+    public void TweenPopupOff(TweenCallback callback)
+    {
+        transform.DOScale(0.0f, _popupDuration).OnComplete(callback.Invoke);
     }
 
     protected virtual void TweenChildComponent()

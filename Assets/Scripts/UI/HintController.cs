@@ -10,8 +10,8 @@ public class HintController : PopupController
     [SerializeField] TextMeshProUGUI _txtHint;
     [SerializeField] Transform[] _arrBtns;
 
-    private const int BUTTON_NEXT_HINT = 0;
-    private const int BUTTON_RETURN = 1;
+    private const int BUTTON_LEFT_CLICK = 0;
+    private const int BUTTON_RIGHT_CLICK = 1;
 
     //override th này để nó đc xử lý trong callback OnComplete bên base
     protected override void TweenChildComponent()
@@ -35,13 +35,19 @@ public class HintController : PopupController
 
     public void OnClick(int index)
     {
-        if (index == BUTTON_NEXT_HINT)
-        {
-
-        }
+        if (index == BUTTON_LEFT_CLICK)
+            ButtonLeftClick();
         else
-        {
+            ButtonRightClick();
+    }
 
-        }
+    protected virtual void ButtonLeftClick()
+    {
+
+    }
+
+    protected virtual void ButtonRightClick()
+    {
+        UIManager.Instance.TogglePopup(GameEnums.EPopupID.PopupHint, false);
     }
 }
