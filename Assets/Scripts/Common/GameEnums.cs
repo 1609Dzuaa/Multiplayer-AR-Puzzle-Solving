@@ -8,6 +8,14 @@ public static class GameEnums
     {
         OnLogoTweenCompleted,
         OnStartGame,
+        OnReceiveNotiParam,
+
+    }
+
+    public enum EPopupID
+    {
+        PopupHint = 0,
+        PopupInformation = 1,
 
     }
 }
