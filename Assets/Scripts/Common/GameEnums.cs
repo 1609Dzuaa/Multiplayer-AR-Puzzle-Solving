@@ -9,6 +9,7 @@ public static class GameEnums
         OnLogoTweenCompleted,
         OnStartGame,
         OnReceiveNotiParam,
+        OnTrackedImageSuccess,
 
     }
 
@@ -17,5 +18,6 @@ public static class GameEnums
         PopupHint = 0,
         PopupLeaderboard = 1,
         PopupInformation = 4,
+        PopupReward = 2,
     }
 }

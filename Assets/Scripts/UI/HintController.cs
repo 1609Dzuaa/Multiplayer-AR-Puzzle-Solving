@@ -29,6 +29,7 @@ public class HintController : PopupController
 
     protected override void ResetComponent()
     {
+        base.ResetComponent();
         for (int i = 0; i < _arrBtns.Length; i++)
             _arrBtns[i].localScale = Vector3.zero;
         _txtHint.DOFade(0f, .01f);

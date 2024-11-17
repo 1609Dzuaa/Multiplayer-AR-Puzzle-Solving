@@ -23,6 +23,8 @@ public class UIManager : BaseSingleton<UIManager>
     [Header("Các main component của AR system, mới vào thì giấu nó đi để tránh bug")]
     [SerializeField] Transform[] _arrARComponents; //đừng active component "UI" trước các component khác
 
+    [SerializeField] Transform[] _arrMainMenuComponents;
+
     [Header("Popups")]
     [SerializeField] PopupStruct[] _arrPopups;
     Dictionary<EPopupID, GameObject> _dictPopups = new Dictionary<EPopupID, GameObject>();
@@ -65,7 +67,9 @@ public class UIManager : BaseSingleton<UIManager>
 
         _sceneTrans.DOLocalMoveX(targetPos, _duration).OnComplete(() =>
         {
-            gameObject.SetActive(false);
+
+            for (int i = 0; i < _arrMainMenuComponents.Length; i++)
+                _arrMainMenuComponents[i].gameObject.SetActive(false);
 
             for (int i = 0; i < _arrARComponents.Length; i++)
                 _arrARComponents[i].gameObject.SetActive(true);
