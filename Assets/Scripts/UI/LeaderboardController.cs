@@ -1,18 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static GameEnums;
 
-public class LeaderboardController : MonoBehaviour
+public class LeaderboardController : PopupController
 {
-    // Start is called before the first frame update
-    void Start()
+    public void ButtonCloseClick()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        UIManager.Instance.TogglePopup(EPopupID.PopupLeaderboard, false);
     }
 }

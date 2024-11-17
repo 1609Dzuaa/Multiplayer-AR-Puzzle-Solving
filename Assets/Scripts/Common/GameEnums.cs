@@ -15,7 +15,7 @@ public static class GameEnums
     public enum EPopupID
     {
         PopupHint = 0,
-        PopupInformation = 1,
-
+        PopupLeaderboard = 1,
+        PopupInformation = 4,
     }
 }
