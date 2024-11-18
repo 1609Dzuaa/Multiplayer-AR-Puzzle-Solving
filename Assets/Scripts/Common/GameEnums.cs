@@ -17,6 +17,8 @@ public static class GameEnums
     {
         PopupHint = 0,
         PopupLeaderboard = 1,
+        PopupSetting = 2,
+        PopupLeaveGame = 3,
         PopupInformation = 4,
         PopupReward = 2,
     }
