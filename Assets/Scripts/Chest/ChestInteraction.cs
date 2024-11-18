@@ -3,6 +3,8 @@
 public class ChestInteraction : MonoBehaviour
 {
     [SerializeField] Transform _parent;
+    [SerializeField] ParticleSystem _psConfetti;
+    [SerializeField] Transform _confettiPosition;
 
     private Animator _anim;
     private bool _isOpened = false;
@@ -59,5 +61,10 @@ public class ChestInteraction : MonoBehaviour
     public void OpenChest()
     {
         _anim.SetInteger("state", STATE_OPEN);
+    }
+
+    public void SpawnConfetti()
+    {
+        Instantiate(_psConfetti, _confettiPosition.position, Quaternion.identity).Play();
     }
 }

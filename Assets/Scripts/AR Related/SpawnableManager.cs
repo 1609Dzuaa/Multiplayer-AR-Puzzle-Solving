@@ -16,9 +16,8 @@ public class SpawnableManager : MonoBehaviour
     void Start()
     {
         _spawnObject = null;
-        //_arCam = GameObject.Find("Main Camera").GetComponent<Camera>();
-        if (_arCam != null)
-            Debug.Log("AR Cam not null");
+        //if (_arCam != null)
+            //Debug.Log("AR Cam not null");
     }
 
     // Update is called once per frame
