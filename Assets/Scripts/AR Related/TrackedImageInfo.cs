@@ -12,7 +12,6 @@ public class TrackedImageInfo : MonoBehaviour
 
     Dictionary<string, GameObject> _spawnPrefabs = new Dictionary<string, GameObject>();
     ARTrackedImageManager _trackedImageManager;
-    bool _allowDisplay;
 
     private void Awake()
     {
@@ -23,6 +22,7 @@ public class TrackedImageInfo : MonoBehaviour
             GameObject newPrefab = Instantiate(prefab, Vector3.zero, Quaternion.identity);
             newPrefab.name = prefab.name;
             _spawnPrefabs.Add(prefab.name, newPrefab);
+            newPrefab.SetActive(false);
             //Debug.Log("name: " + prefab.name);
         }
     }
@@ -52,6 +52,7 @@ public class TrackedImageInfo : MonoBehaviour
         foreach (ARTrackedImage trackImage in eventArgs.removed)
         {
             _spawnPrefabs[trackImage.name].SetActive(false);
+            Debug.Log("active false, image name: " + trackImage.name);
         }
     }
 
@@ -67,7 +68,7 @@ public class TrackedImageInfo : MonoBehaviour
 
         foreach(GameObject go in _spawnPrefabs.Values)
         {
-            if (go.name != name)
+            if (go.name != name && go.activeSelf)
             {
                 go.SetActive(false);
                 Debug.Log("active false, goName, name: " + go.name + ", " + name);

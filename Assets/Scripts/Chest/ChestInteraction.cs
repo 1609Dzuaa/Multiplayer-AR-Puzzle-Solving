@@ -1,41 +1,63 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class ChestInteraction : MonoBehaviour
 {
-    private Animator _animator;
+    [SerializeField] Transform _parent;
+
+    private Animator _anim;
     private bool _isOpened = false;
+    const int STATE_ROTATION = 1;
+    const int STATE_OPEN = 2;
+    const int STATE_CLOSED = 3;
 
     void Start()
     {
-        _animator = GetComponent<Animator>();
+        _anim = GetComponent<Animator>();
     }
 
     void Update()
     {
-        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+#if UNITY_EDITOR
+        if (Input.GetMouseButtonDown(0))
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
             if (Physics.Raycast(ray, out hit))
             {
-                if (hit.collider.gameObject == gameObject && !_isOpened)
+                if (hit.collider.gameObject == _parent.gameObject && !_isOpened)
                 {
                     RotateChest();
                 }
             }
         }
+#else
+
+    if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.GetTouch(0).position);
+        RaycastHit hit;
+
+        if (Physics.Raycast(ray, out hit))
+        {
+            if (hit.collider.gameObject == _parent.gameObject && !_isOpened)
+            {
+                RotateChest();
+            }
+        }
+    }
+#endif
     }
 
     private void RotateChest()
     {
         _isOpened = true;
-        _animator.SetTrigger("Rotation");
+        _anim.SetInteger("state", STATE_ROTATION);
         //Debug.Log("Chest opened! Show reward.");
     }
 
     public void OpenChest()
     {
-        _animator.SetTrigger("Open");
+        _anim.SetInteger("state", STATE_OPEN);
     }
 }

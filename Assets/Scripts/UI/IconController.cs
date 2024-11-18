@@ -29,7 +29,7 @@ public class IconController : MonoBehaviour
         transform.DOLocalMoveX((_isForward) ? _initialPosX - _distance : _initialPosX, _tweenDuration);
         _imgToggleBtn.transform.localScale = (_isForward) ? new Vector3(-1, 1, 1) : Vector3.one;
         _isForward = !_isForward;
-        Debug.Log("On Click");
+        //Debug.Log("On Click");
     }
 
     public void IconOnClick(int index)
