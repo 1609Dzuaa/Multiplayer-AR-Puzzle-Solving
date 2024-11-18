@@ -47,9 +47,13 @@ public class IconController : MonoBehaviour
                 break;
 
             case BUTTON_SETTING:
+                UIManager.Instance.TogglePopup(EPopupID.PopupSetting, true);
+                ToggleButtonOnClick();
                 break;
 
             case BUTTON_OUT:
+                UIManager.Instance.TogglePopup(EPopupID.PopupLeaveGame, true);
+                ToggleButtonOnClick();
                 break;
         }
     }
