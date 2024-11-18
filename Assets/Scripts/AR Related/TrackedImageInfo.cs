@@ -64,6 +64,11 @@ public class TrackedImageInfo : MonoBehaviour
         GameObject prefab = _spawnPrefabs[name];
         prefab.transform.position = position;
         prefab.SetActive(true);
+        Question quest = QuestManager.Instance.ListQuest.Find(x => x.ImageName == name);
+
+        if (!quest) Debug.Log("Question of image: " + name + " get null");
+        else EventsManager.Instance.Notify(EventID.OnReceiveQuestInfo, quest);
+
         Debug.Log("active true: " + prefab);
 
         foreach(GameObject go in _spawnPrefabs.Values)
