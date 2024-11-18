@@ -14,6 +14,12 @@ public class HintController : PopupController
     protected const int BUTTON_LEFT_CLICK = 0;
     protected const int BUTTON_RIGHT_CLICK = 1;
 
+    private void Start()
+    {
+        Question firstQuest = QuestManager.Instance.GetRandomQuest();
+        _txtHint.text = firstQuest.Hint;
+    }
+
     //override th này để nó đc xử lý trong callback OnComplete bên base
     protected override void TweenChildComponent()
     {

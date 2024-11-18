@@ -13,6 +13,11 @@ public class RewardController : HintController
         EventsManager.Instance.Subcribe(EventID.OnTrackedImageSuccess, ReceiveData);
     }
 
+    private void Start()
+    {
+        Debug.Log("do nothing");
+    }
+
     private void OnDestroy()
     {
         EventsManager.Instance.Unsubcribe(EventID.OnTrackedImageSuccess, ReceiveData);
@@ -20,7 +25,8 @@ public class RewardController : HintController
 
     private void ReceiveData(object obj)
     {
-
+        Question questInfo = (Question)obj;
+        _txtHint.text = "You Receive " + questInfo.Score + " Points!";
     }
 
     protected override void ButtonLeftClick()

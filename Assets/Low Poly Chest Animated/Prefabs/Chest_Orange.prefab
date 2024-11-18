@@ -71,6 +71,7 @@ MonoBehaviour:
   _parent: {fileID: 3353555488130194286}
   _psConfetti: {fileID: 4938095755617958530, guid: 2e79f16be10fbd14f8d5ef191f8db4aa,
     type: 3}
+  _psSparkle: {fileID: 8415397781513438054}
   _confettiPosition: {fileID: 7702976017194804928}
 --- !u!1 &2884705084735435304
 GameObject:
@@ -276,7 +277,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 53385035123283050}
-  m_LocalEulerAnglesHint: {x: 61.79548, y: 180, z: -180}
+  m_LocalEulerAnglesHint: {x: 55.000004, y: 180, z: -180}
 --- !u!33 &3585318764187906248
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -430,6 +431,12 @@ PrefabInstance:
 --- !u!4 &8415397781513438052 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4033412786151888122, guid: 49057b33ea71fbb4da4e8f02a8db9f28,
+    type: 3}
+  m_PrefabInstance: {fileID: 4841633744435681182}
+  m_PrefabAsset: {fileID: 0}
+--- !u!198 &8415397781513438054 stripped
+ParticleSystem:
+  m_CorrespondingSourceObject: {fileID: 4033412786151888120, guid: 49057b33ea71fbb4da4e8f02a8db9f28,
     type: 3}
   m_PrefabInstance: {fileID: 4841633744435681182}
   m_PrefabAsset: {fileID: 0}
