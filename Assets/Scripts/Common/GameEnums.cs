@@ -21,6 +21,6 @@ public static class GameEnums
         PopupSetting = 2,
         PopupLeaveGame = 3,
         PopupInformation = 4,
-        PopupReward = 2,
+        PopupReward = 5,
     }
 }
