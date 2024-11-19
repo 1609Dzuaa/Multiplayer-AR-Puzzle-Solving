@@ -38,7 +38,7 @@ public class PopupController : MonoBehaviour
 
     protected virtual void TweenChildComponent()
     {
-        Debug.Log("Tween child called");
+        //Debug.Log("Tween child called");
     }
 
     protected void OnDisable()
