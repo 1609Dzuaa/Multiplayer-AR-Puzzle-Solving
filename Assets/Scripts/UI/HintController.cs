@@ -13,11 +13,12 @@ public class HintController : PopupController
 
     protected const int BUTTON_LEFT_CLICK = 0;
     protected const int BUTTON_RIGHT_CLICK = 1;
+    Question _currentQuest;
 
     private void Start()
     {
-        Question firstQuest = QuestManager.Instance.GetRandomQuest();
-        _txtHint.text = firstQuest.Hint;
+        _currentQuest = QuestManager.Instance.GetRandomQuest();
+        _txtHint.text = (_currentQuest != null) ? _currentQuest.Hint : "No Hint Left";
     }
 
     //override th này để nó đc xử lý trong callback OnComplete bên base
@@ -51,10 +52,15 @@ public class HintController : PopupController
 
     protected virtual void ButtonLeftClick()
     {
-        string content = "Do You Want Next Hint ?";
+        _currentQuest = QuestManager.Instance.GetRandomQuest(_currentQuest);
+        _txtHint.text = (_currentQuest != null) ? _currentQuest.Hint : "No Hint Left";
+
+        //thiết kế extra-hint: thêm một btn nhỏ bên góc phải-trung tâm
+        //bấm vào thì text sang hint kế, bấm lại thì sang hint trước
+        /*string content = "Do You Want Next Hint ?";
         NotificationParam param = new NotificationParam(content);
         EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
-        UIManager.Instance.TogglePopup(EPopupID.PopupInformation, true);
+        UIManager.Instance.TogglePopup(EPopupID.PopupInformation, true);*/
     }
 
     protected virtual void ButtonRightClick()
