@@ -17,6 +17,7 @@ public class ButtonController : MonoBehaviour
 
     public void OnClick(int index)
     {
+        SoundsManager.Instance.PlaySfx(ESoundName.Button1SFX);
         switch (index) 
         {
             case (int)ButtonIndex.Start:
