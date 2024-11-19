@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Runtime.CompilerServices;
+using UnityEngine;
 using static GameEnums;
 
 public class ChestInteraction : MonoBehaviour
@@ -90,9 +91,12 @@ public class ChestInteraction : MonoBehaviour
     public void PopupReward()
     {
         //gửi thông tin của quest ở đây
-        //vậy thì cần link thằng image với cái SO
+        //hiện tại đang có bug nếu quest 1 đằng nhưng track ra cái chưa có quest thì nó hiện no hint left
+        //trong khi vẫn còn 1 hint
+        //audio của 1 trong 3 thằng đang bị disable đầu game
+        QuestManager.Instance.RemoveQuest(_questInfo);
         EventsManager.Instance.Notify(EventID.OnTrackedImageSuccess, _questInfo);
         UIManager.Instance.TogglePopup(EPopupID.PopupReward, true);
-        QuestManager.Instance.RemoveQuest(_questInfo);
+        //QuestManager.Instance.RemoveQuest(_questInfo);
     }
 }

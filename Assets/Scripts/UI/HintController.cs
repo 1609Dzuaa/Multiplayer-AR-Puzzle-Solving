@@ -17,7 +17,19 @@ public class HintController : PopupController
 
     private void Start()
     {
+        EventsManager.Instance.Subcribe(EventID.OnTrackedImageSuccess, GetNextQuest);
         _currentQuest = QuestManager.Instance.GetRandomQuest();
+        _txtHint.text = (_currentQuest != null) ? _currentQuest.Hint : "No Hint Left";
+    }
+
+    private void OnDestroy()
+    {
+        EventsManager.Instance.Unsubcribe(EventID.OnTrackedImageSuccess, GetNextQuest);
+    }
+
+    private void GetNextQuest(object obj = null)
+    {
+        _currentQuest = QuestManager.Instance.GetRandomQuest(_currentQuest);
         _txtHint.text = (_currentQuest != null) ? _currentQuest.Hint : "No Hint Left";
     }
 
@@ -52,8 +64,7 @@ public class HintController : PopupController
 
     protected virtual void ButtonLeftClick()
     {
-        _currentQuest = QuestManager.Instance.GetRandomQuest(_currentQuest);
-        _txtHint.text = (_currentQuest != null) ? _currentQuest.Hint : "No Hint Left";
+        GetNextQuest();
 
         //thiết kế extra-hint: thêm một btn nhỏ bên góc phải-trung tâm
         //bấm vào thì text sang hint kế, bấm lại thì sang hint trước

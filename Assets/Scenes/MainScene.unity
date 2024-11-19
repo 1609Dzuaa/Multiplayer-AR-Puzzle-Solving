@@ -1358,7 +1358,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &215889069
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5160,6 +5160,7 @@ GameObject:
   m_Component:
   - component: {fileID: 714907573}
   - component: {fileID: 714907574}
+  - component: {fileID: 714907575}
   m_Layer: 5
   m_Name: Slider
   m_TagString: Untagged
@@ -5239,7 +5240,32 @@ MonoBehaviour:
   m_Value: 0.715
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 714907575}
+        m_TargetAssemblyTypeName: SliderController, Assembly-CSharp
+        m_MethodName: OnValueChanged
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &714907575
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 714907572}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ba661cd2c2fa454fbf562fb5a30703d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isSFXSource: 0
 --- !u!1 &717440024
 GameObject:
   m_ObjectHideFlags: 0
@@ -5400,6 +5426,7 @@ GameObject:
   m_Component:
   - component: {fileID: 721702170}
   - component: {fileID: 721702171}
+  - component: {fileID: 721702172}
   m_Layer: 5
   m_Name: Slider
   m_TagString: Untagged
@@ -5479,7 +5506,32 @@ MonoBehaviour:
   m_Value: 0.494
   m_OnValueChanged:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 721702172}
+        m_TargetAssemblyTypeName: SliderController, Assembly-CSharp
+        m_MethodName: OnValueChanged
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+--- !u!114 &721702172
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 721702169}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7ba661cd2c2fa454fbf562fb5a30703d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isSFXSource: 0
 --- !u!1 &734059783
 GameObject:
   m_ObjectHideFlags: 0
@@ -5842,7 +5894,7 @@ AudioListener:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 769282048}
-  m_Enabled: 1
+  m_Enabled: 0
 --- !u!1 &776329740
 GameObject:
   m_ObjectHideFlags: 0
@@ -11107,7 +11159,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 1270980483}
         m_TargetAssemblyTypeName: ButtonURL, Assembly-CSharp
         m_MethodName: OnClick
         m_Mode: 1
