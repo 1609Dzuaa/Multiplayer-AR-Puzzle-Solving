@@ -17,15 +17,19 @@ public class UIManager : BaseSingleton<UIManager>
     [SerializeField] MainMenuButton _mainMenuBtn;
     [SerializeField] Transform _mainMenuUI;
     [SerializeField] Transform _sceneTrans;
+    [SerializeField] Transform _dimmedBG;
     [SerializeField] float _distance;
     [SerializeField] float _duration;
 
     [Header("Các main component của AR system, mới vào thì giấu nó đi để tránh bug")]
     [SerializeField] Transform[] _arrARComponents; //đừng active component "UI" trước các component khác
 
+    [SerializeField] Transform[] _arrMainMenuComponents;
+
     [Header("Popups")]
     [SerializeField] PopupStruct[] _arrPopups;
     Dictionary<EPopupID, GameObject> _dictPopups = new Dictionary<EPopupID, GameObject>();
+    Stack<GameObject> _stackPopupOrder = new Stack<GameObject>();
     Vector3 _initPos = Vector3.zero;
 
     protected override void Awake()
@@ -65,7 +69,9 @@ public class UIManager : BaseSingleton<UIManager>
 
         _sceneTrans.DOLocalMoveX(targetPos, _duration).OnComplete(() =>
         {
-            gameObject.SetActive(false);
+
+            for (int i = 0; i < _arrMainMenuComponents.Length; i++)
+                _arrMainMenuComponents[i].gameObject.SetActive(false);
 
             for (int i = 0; i < _arrARComponents.Length; i++)
                 _arrARComponents[i].gameObject.SetActive(true);
@@ -79,12 +85,20 @@ public class UIManager : BaseSingleton<UIManager>
 
     public void TogglePopup(EPopupID id, bool On)
     {
-        if (_dictPopups[id].gameObject.activeInHierarchy && On) return;
+        if (_dictPopups[id].activeInHierarchy && On) return;
 
         //Maybe need to re-order render here
         if (On)
-            _dictPopups[id].gameObject.SetActive(true);
+        {
+            _dictPopups[id].SetActive(true);
+            _stackPopupOrder.Push(_dictPopups[id]);
+        }
         else
+        {
             _dictPopups[id].gameObject.GetComponent<PopupController>().TweenPopupOff(() => _dictPopups[id].gameObject.SetActive(false));
+            _stackPopupOrder.Pop();
+        }
+
+        _dimmedBG.gameObject.SetActive((_stackPopupOrder.Count > 0) ? true : On);
     }
 }

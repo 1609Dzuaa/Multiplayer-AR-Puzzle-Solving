@@ -23,7 +23,7 @@ public class PopupController : MonoBehaviour
 
     protected virtual void ResetComponent()
     {
-
+        transform.localPosition = Vector3.zero;
     }
 
     protected void TweenPopupOn()

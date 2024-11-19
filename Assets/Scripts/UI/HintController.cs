@@ -14,6 +14,12 @@ public class HintController : PopupController
     protected const int BUTTON_LEFT_CLICK = 0;
     protected const int BUTTON_RIGHT_CLICK = 1;
 
+    private void Start()
+    {
+        Question firstQuest = QuestManager.Instance.GetRandomQuest();
+        _txtHint.text = firstQuest.Hint;
+    }
+
     //override th này để nó đc xử lý trong callback OnComplete bên base
     protected override void TweenChildComponent()
     {
@@ -29,6 +35,7 @@ public class HintController : PopupController
 
     protected override void ResetComponent()
     {
+        base.ResetComponent();
         for (int i = 0; i < _arrBtns.Length; i++)
             _arrBtns[i].localScale = Vector3.zero;
         _txtHint.DOFade(0f, .01f);

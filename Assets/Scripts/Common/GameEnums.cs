@@ -9,6 +9,8 @@ public static class GameEnums
         OnLogoTweenCompleted,
         OnStartGame,
         OnReceiveNotiParam,
+        OnReceiveQuestInfo,
+        OnTrackedImageSuccess,
 
     }
 
@@ -19,6 +21,7 @@ public static class GameEnums
         PopupSetting = 2,
         PopupLeaveGame = 3,
         PopupInformation = 4,
+        PopupReward = 5,
     }
 
     public enum ESoundName

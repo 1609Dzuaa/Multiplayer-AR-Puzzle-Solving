@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.XR.ARFoundation;
@@ -16,9 +16,8 @@ public class SpawnableManager : MonoBehaviour
     void Start()
     {
         _spawnObject = null;
-        //_arCam = GameObject.Find("Main Camera").GetComponent<Camera>();
-        if (_arCam != null)
-            Debug.Log("AR Cam not null");
+        //if (_arCam != null)
+            //Debug.Log("AR Cam not null");
     }
 
     // Update is called once per frame
@@ -38,6 +37,7 @@ public class SpawnableManager : MonoBehaviour
                 {
                     if (hit.collider.CompareTag("GoldCoin"))
                     {
+                        //bắn event track đc vật thể
                         _spawnObject = hit.collider.gameObject;
                         //SpawnPrefab(_hits[0].pose.position);
                     }
