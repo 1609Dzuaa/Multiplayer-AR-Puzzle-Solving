@@ -6,6 +6,7 @@ TagManager:
   tags:
   - GoldCoin
   - SilverCoin
+  - Audio
   layers:
   - Default
   - TransparentFX

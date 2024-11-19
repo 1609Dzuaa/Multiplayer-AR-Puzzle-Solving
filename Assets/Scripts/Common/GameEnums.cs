@@ -20,4 +20,11 @@ public static class GameEnums
         PopupLeaveGame = 3,
         PopupInformation = 4,
     }
+
+    public enum ESoundName
+    {
+        BGM,
+        Button1SFX,
+        Button2SFX,
+    }
 }
