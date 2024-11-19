@@ -35,7 +35,7 @@ MonoBehaviour:
       m_GuidHigh: 10382190384300566569
     m_Size: {x: 0.07504333, y: 0.1}
     m_SpecifySize: 1
-    m_Name: SilverCoin
+    m_Name: Chest_Orange 1
     m_Texture: {fileID: 2800000, guid: 0f5dedd0a6f05e042928b6b625f31490, type: 3}
   - m_SerializedGuid:
       m_GuidLow: 5539729025220808387
