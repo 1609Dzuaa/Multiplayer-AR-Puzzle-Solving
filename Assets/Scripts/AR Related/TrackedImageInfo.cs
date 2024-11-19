@@ -44,6 +44,7 @@ public class TrackedImageInfo : MonoBehaviour
         Question questInfo = obj as Question;
         Destroy(_dictSpawnPrefabs[questInfo.ImageName]);
         _dictSpawnPrefabs.Remove(questInfo.ImageName);
+        Debug.Log("remove: " +  questInfo.ImageName);
     }
 
     private void OnEnable()

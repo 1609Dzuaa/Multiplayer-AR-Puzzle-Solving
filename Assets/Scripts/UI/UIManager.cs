@@ -36,6 +36,8 @@ public class UIManager : BaseSingleton<UIManager>
     {
         base.Awake();
         DontDestroyOnLoad(gameObject);
+        //for (int i = 0; i < _arrARComponents.Length; i++)
+            //_arrARComponents[i].gameObject.SetActive(false);
         _mainMenuBtn.gameObject.SetActive(false);
         _initPos = _sceneTrans.localPosition;
         EventsManager.Instance.Subcribe(EventID.OnLogoTweenCompleted, TweenButtons);
@@ -50,6 +52,9 @@ public class UIManager : BaseSingleton<UIManager>
                 _dictPopups.Add(_arrPopups[i].ID, _arrPopups[i].Popup);
             _arrPopups[i].Popup.SetActive(false);
         }
+
+        for (int i = 0; i < _arrARComponents.Length; i++)
+            _arrARComponents[i].gameObject.SetActive(false);
     }
 
     private void OnDestroy()
