@@ -41,9 +41,29 @@ MonoBehaviour:
       m_GuidLow: 5539729025220808387
       m_GuidHigh: 17020995673998341277
     m_SerializedTextureGuid:
-      m_GuidLow: 15245985612421559433
-      m_GuidHigh: 10571763592316456714
+      m_GuidLow: 14957676460643227690
+      m_GuidHigh: 12340041784658409449
     m_Size: {x: 0.1, y: 0.1}
     m_SpecifySize: 1
-    m_Name: GoldCoin
-    m_Texture: {fileID: 2800000, guid: 471a74899f23d3940a0f6ec1f972b692, type: 3}
+    m_Name: Chest_Orange 2
+    m_Texture: {fileID: 2800000, guid: e5dc982a577dcf94e9b70a709fa240ab, type: 3}
+  - m_SerializedGuid:
+      m_GuidLow: 4661343084782583856
+      m_GuidHigh: 13220041432805317806
+    m_SerializedTextureGuid:
+      m_GuidLow: 3716856764432037090
+      m_GuidHigh: 11452073158093624600
+    m_Size: {x: 0.1, y: 0.1}
+    m_SpecifySize: 1
+    m_Name: Chest_Orange 3
+    m_Texture: {fileID: 2800000, guid: d4fab4e2ed88339418d5f491dcefed9e, type: 3}
+  - m_SerializedGuid:
+      m_GuidLow: 4824847255967377130
+      m_GuidHigh: 7572890402268680619
+    m_SerializedTextureGuid:
+      m_GuidLow: 6563042253700460567
+      m_GuidHigh: 15432315794861276313
+    m_Size: {x: 0.1, y: 0.1}
+    m_SpecifySize: 1
+    m_Name: Chest_Orange 4
+    m_Texture: {fileID: 2800000, guid: 41b1f0179c285b14993c5b9673992ad6, type: 3}

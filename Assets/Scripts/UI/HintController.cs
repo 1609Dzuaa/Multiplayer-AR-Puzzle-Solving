@@ -29,7 +29,8 @@ public class HintController : PopupController
 
     private void GetNextQuest(object obj = null)
     {
-        _currentQuest = QuestManager.Instance.GetRandomQuest(_currentQuest);
+        Question questRemove = obj as Question;
+        _currentQuest = QuestManager.Instance.GetRandomQuest((questRemove != null) ? questRemove : _currentQuest);
         _txtHint.text = (_currentQuest != null) ? _currentQuest.Hint : "No Hint Left";
     }
 
