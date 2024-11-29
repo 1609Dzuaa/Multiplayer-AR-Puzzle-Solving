@@ -22,6 +22,8 @@ public static class GameEnums
         PopupLeaveGame = 3,
         PopupInformation = 4,
         PopupReward = 5,
+        PopupLobby = 6,
+
     }
 
     public enum ESoundName

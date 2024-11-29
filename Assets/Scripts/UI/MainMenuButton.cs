@@ -7,10 +7,18 @@ public class MainMenuButton : MonoBehaviour
 {
     [SerializeField] Transform[] _arrBtn;
     [SerializeField] float _tweenDuration;
+    bool _isFirstOnEnable = true;
 
     private void OnEnable()
     {
-        OnDisable();
+        if (_isFirstOnEnable)
+        {
+            _isFirstOnEnable = false;
+            OnDisable();
+            return;
+        }
+
+        //OnDisable();
 
         Sequence sequence = DOTween.Sequence();
 

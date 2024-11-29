@@ -9,7 +9,7 @@ public class GameManager : BaseSingleton<GameManager>
     protected override void Awake()
     {
         base.Awake();
-        DontDestroyOnLoad(gameObject);
+        //DontDestroyOnLoad(gameObject);
         Application.targetFrameRate = _targetFrameRate;
     }
 }

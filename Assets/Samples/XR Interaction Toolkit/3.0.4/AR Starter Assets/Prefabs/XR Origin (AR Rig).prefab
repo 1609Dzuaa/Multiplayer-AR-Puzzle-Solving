@@ -372,6 +372,9 @@ MonoBehaviour:
   _placeablePrefabs:
   - {fileID: 2884705084735435304, guid: 78eae56a9b0bec644be557db7f85145c, type: 3}
   - {fileID: 2884705084735435304, guid: 62c98682cca467e4bb845fd4b96ae5bd, type: 3}
+  - {fileID: 2884705084735435304, guid: 501282e487cfa104f849a2476a59f1ac, type: 3}
+  - {fileID: 2884705084735435304, guid: c8b9e4d573111f047ae24bbf1c4be2e4, type: 3}
+  - {fileID: 2884705084735435304, guid: 6501efc796ba0074e8557741b5c649c5, type: 3}
 --- !u!1 &2512387470890420964
 GameObject:
   m_ObjectHideFlags: 0

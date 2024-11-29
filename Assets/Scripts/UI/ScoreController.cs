@@ -28,4 +28,9 @@ public class ScoreController : MonoBehaviour
         Question questInfo = (Question)obj;
         DOTween.To(() => _score, x => _score = x, _score + questInfo.Score, _duration).OnUpdate(() => _txtScore.text = "Score: " +_score.ToString());
     }
+
+    private void Update()
+    {
+        _txtScore.text = (1.0f / Time.deltaTime).ToString();
+    }
 }
