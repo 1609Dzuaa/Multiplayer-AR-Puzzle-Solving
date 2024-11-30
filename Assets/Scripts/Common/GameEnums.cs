@@ -11,6 +11,7 @@ public static class GameEnums
         OnReceiveNotiParam,
         OnReceiveQuestInfo,
         OnTrackedImageSuccess,
+        OnRefreshLobby,
 
     }
 
@@ -23,6 +24,7 @@ public static class GameEnums
         PopupInformation = 4,
         PopupReward = 5,
         PopupLobby = 6,
+        PopupConfigRoom = 7,
 
     }
 

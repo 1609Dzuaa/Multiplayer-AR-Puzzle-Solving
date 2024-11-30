@@ -15,7 +15,7 @@ public class RewardController : HintController
 
     private void Start()
     {
-        Debug.Log("do nothing");
+        //Debug.Log("do nothing");
     }
 
     private void OnDestroy()

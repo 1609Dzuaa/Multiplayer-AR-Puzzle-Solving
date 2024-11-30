@@ -11,14 +11,14 @@ public class MainMenuButton : MonoBehaviour
 
     private void OnEnable()
     {
-        if (_isFirstOnEnable)
+        /*if (_isFirstOnEnable)
         {
             _isFirstOnEnable = false;
             OnDisable();
             return;
-        }
+        }*/
 
-        //OnDisable();
+        OnDisable();
 
         Sequence sequence = DOTween.Sequence();
 

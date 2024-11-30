@@ -4,6 +4,7 @@ using UnityEngine;
 using static GameEnums;
 using DG.Tweening;
 using UnityEngine.SceneManagement;
+using Unity.Netcode;
 
 [System.Serializable]
 public struct PopupStruct
@@ -18,6 +19,8 @@ public class UIManager : BaseSingleton<UIManager>
     [SerializeField] Transform _mainMenuUI;
     [SerializeField] Transform _sceneTrans;
     [SerializeField] Transform _dimmedBG;
+    [SerializeField] Transform _mainContent;
+    [SerializeField] Transform _chooseRole;
     [SerializeField] float _distance;
     [SerializeField] float _duration;
 
@@ -41,6 +44,7 @@ public class UIManager : BaseSingleton<UIManager>
         _initPos = _sceneTrans.localPosition;
         EventsManager.Instance.Subcribe(EventID.OnLogoTweenCompleted, TweenButtons);
         EventsManager.Instance.Subcribe(EventID.OnStartGame, StartGame);
+        //Debug.Log($"Server IP: {NetworkManager.Singleton.ConnectedClients[NetworkManager.Singleton.LocalClientId].ClientId}");
     }
 
     private void Start()
@@ -81,6 +85,8 @@ public class UIManager : BaseSingleton<UIManager>
             for (int i = 0; i < _arrARComponents.Length; i++)
                 _arrARComponents[i].gameObject.SetActive(true);
 
+            HideAllCurrentPopups();
+
             _sceneTrans.DOLocalMoveX(targetPos + _distance, _duration).OnComplete(() =>
             {
                 _sceneTrans.localPosition = _initPos;
@@ -105,5 +111,29 @@ public class UIManager : BaseSingleton<UIManager>
         }
 
         _dimmedBG.gameObject.SetActive((_stackPopupOrder.Count > 0) ? true : On);
+    }
+
+    public void HideAllCurrentPopups()
+    {
+        for (int i = 0; i <= _stackPopupOrder.Count; i++)
+        {
+            _stackPopupOrder.Pop().gameObject.SetActive(false);
+        }
+        _dimmedBG.gameObject.SetActive(false);
+    }
+
+    public void StartMainMenu()
+    {
+        float targetPos = _initPos.x + _distance;
+
+        _sceneTrans.DOLocalMoveX(targetPos, _duration).OnComplete(() =>
+        {
+            _chooseRole.gameObject.SetActive(false);
+            _mainContent.gameObject.SetActive(true);
+            _sceneTrans.DOLocalMoveX(targetPos + _distance, _duration).OnComplete(() =>
+            {
+                _sceneTrans.localPosition = _initPos;
+            });
+        });
     }
 }
