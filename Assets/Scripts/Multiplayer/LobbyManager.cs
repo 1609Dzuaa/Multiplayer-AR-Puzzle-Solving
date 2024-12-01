@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Services.Authentication;
@@ -9,12 +10,15 @@ using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using static GameEnums;
 
-public class TestLobbies : BaseSingleton<TestLobbies>
+public class LobbyManager : BaseSingleton<LobbyManager>
 {
     private Lobby _hostLobby, _joinedLobby;
     float _heartBeatTimer;
     float _lobbyUpdateTimer;
-    [SerializeField] TextMeshProUGUI _txtCode;
+
+    const int DEFAULT_CURRENT_TOTAL_PLAYER = 1;
+    const int DEFAULT_MAX_PLAYER = 5;
+    const int DEFAULT_TOTAL_PLAYER_TO_PLAY = 3;
 
     private async void Start()
     {
@@ -27,7 +31,6 @@ public class TestLobbies : BaseSingleton<TestLobbies>
 
 
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
-        //_txtCode = GetComponent<TextMeshProUGUI>();
     }
 
     private void Update()
@@ -51,35 +54,68 @@ public class TestLobbies : BaseSingleton<TestLobbies>
         }
     }
 
-    private async void CreateLobby()
+    private async void CreateLobby(string lobbyName, int maxPlayers)
     {
-        string lobbyName = "Kaoru Mitoma";
-        int maxPlayers = 4;
-
-        //Tạo đc phòng thì dùng LobbyCode để join phòng
-        try
+        if (String.IsNullOrEmpty(lobbyName))
         {
-            CreateLobbyOptions createLobbyOptions = new CreateLobbyOptions
-            {
-                //IsPrivate = true,
-
-            };
-
-            Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, createLobbyOptions);
-
-            _hostLobby = lobby;
-            _joinedLobby = _hostLobby;
-            Debug.Log("lobby created: " + lobbyName + ", Players: " + maxPlayers + ", " + lobby.Id + ", " + lobby.LobbyCode);
+            string content = "Lobby Name Is Empty";
+            NotificationParam param = new NotificationParam(content);
+            EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
         }
-        catch (LobbyServiceException ex)
+        else if (maxPlayers < DEFAULT_TOTAL_PLAYER_TO_PLAY)
         {
-            Debug.Log(ex);
+            string content = "Cannot create a room under 3 players!";
+            NotificationParam param = new NotificationParam(content);
+            EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
+        }
+        else if (maxPlayers > DEFAULT_MAX_PLAYER)
+        {
+            string content = "Cannot create a room over 5 players!";
+            NotificationParam param = new NotificationParam(content);
+            EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
+        }
+        else
+        {
+            try
+            {
+                CreateLobbyOptions createLobbyOptions = new CreateLobbyOptions
+                {
+                    //IsPrivate = true,
+
+                };
+
+                Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, createLobbyOptions);
+
+                _hostLobby = lobby;
+                _joinedLobby = _hostLobby;
+                Debug.Log("lobby created: " + lobbyName + ", Players: " + maxPlayers + ", " + lobby.Id + ", " + lobby.LobbyCode);
+
+                string content = "Create Lobby Success!";
+                SwitchToMainScene(content);
+            }
+            catch (LobbyServiceException ex)
+            {
+                Debug.Log(ex);
+            }
         }
     }
 
-    public void CreateALobby()
+    private void SwitchToMainScene(string content)
     {
-        CreateLobby();
+        NotificationParam param = new NotificationParam(content, TweenSwitchScene);
+        UIManager.Instance.HideAllCurrentPopups();
+        UIManager.Instance.TogglePopup(EPopupID.PopupInformation, true);
+        EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
+    }
+
+    private void TweenSwitchScene()
+    {
+        EventsManager.Instance.Notify(EventID.OnStartGame);
+    }
+
+    public void CreateALobby(string lobbyName, int maxPlayers)
+    {
+        CreateLobby(lobbyName, maxPlayers);
     }
 
     public void ListLobby()
@@ -87,11 +123,9 @@ public class TestLobbies : BaseSingleton<TestLobbies>
         ListLobbies();
     }
 
-    public void JoinALobby()
+    public void JoinALobby(string lobbyID)
     {
-        string lobbyCode = _txtCode.text.Trim();
-        Debug.Log("join success: " + lobbyCode);
-        JoinLobbyByCode(lobbyCode);
+        JoinLobbyByID(lobbyID);
     }
 
     private async void ListLobbies()
@@ -116,7 +150,7 @@ public class TestLobbies : BaseSingleton<TestLobbies>
             //để tham số default thì lấy mọi lobby
             QueryResponse queryResponse = await Lobbies.Instance.QueryLobbiesAsync(queryLobbiesOptions);
 
-            Debug.Log("Lobbies found: " + queryResponse.Results.Count);
+            Debug.Log("Lobbies found: " + queryResponse.Results.Count + ", " + queryResponse.Results[0].Players.Count);
             foreach (var result in queryResponse.Results)
                 Debug.Log("Lobby: " + result.Name + ", " + result.MaxPlayers);
         }
@@ -126,16 +160,18 @@ public class TestLobbies : BaseSingleton<TestLobbies>
         }
     }
 
-    private async void JoinLobbyByCode(string lobbyCode)
+    private async void JoinLobbyByID(string lobbyID)
     {
         try
         {
             QueryResponse queryResponse = await Lobbies.Instance.QueryLobbiesAsync();
 
-            string cleanedLobbyCode = lobbyCode.Trim().Replace("\u200B", "");
-            await Lobbies.Instance.JoinLobbyByCodeAsync(cleanedLobbyCode);
+            string cleanedLobbylobbyID = lobbyID.Trim().Replace("\u200B", "");
+            await Lobbies.Instance.JoinLobbyByIdAsync(lobbyID);//JoinLobbyByIDAsync(cleanedLobbyCode);
 
-            Debug.Log("join success: " + cleanedLobbyCode);
+            string content = "Join Lobby Success";
+            SwitchToMainScene(content);
+            Debug.Log("join success: " + cleanedLobbylobbyID);
         }
         catch (LobbyServiceException ex)
         {

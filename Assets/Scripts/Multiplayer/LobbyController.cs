@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using DG.Tweening;
+using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
@@ -9,14 +10,26 @@ public class LobbyController : NetworkBehaviour
 {
     [SerializeField] ItemRoomController _itemRoomPrefab;
     [SerializeField] Transform _contentRoom; //nơi chứa các prefabRoom
+    [SerializeField] float _duration;
 
     const int BUTTON_CREATE = 0;
     const int BUTTON_JOIN = 1;
     const int BUTTON_CONFIRM = 2;
+    bool _isFirstOnEnable = true;
 
     private void Awake()
     {
         EventsManager.Instance.Subcribe(EventID.OnRefreshLobby, RefreshLobbyList);
+    }
+
+    private void OnEnable()
+    {
+        if (_isFirstOnEnable)
+        {
+            _isFirstOnEnable = false;
+            return;
+        }
+        LobbyManager.Instance.RefreshLobbies();
     }
 
     public override void OnDestroy()
@@ -36,7 +49,7 @@ public class LobbyController : NetworkBehaviour
 
     public void OnClick()
     {
-        TestLobbies.Instance.RefreshLobbies();
+        LobbyManager.Instance.RefreshLobbies();
     }
 
     private void RefreshLobbyList(object obj)
@@ -45,10 +58,14 @@ public class LobbyController : NetworkBehaviour
         foreach (Transform t in _contentRoom)
             Destroy(t.gameObject);
 
+        Sequence sequence = DOTween.Sequence();
+
         foreach (Lobby room in listLobby)
         {
             ItemRoomController newRoom = Instantiate(_itemRoomPrefab, _contentRoom);
-            newRoom.SetupRoom(room.Id, room.Name, room.AvailableSlots, room.MaxPlayers);
+            newRoom.SetupRoom(room);
+            newRoom.transform.localScale = Vector3.zero;
+            sequence.Append(newRoom.transform.DOScale(1.0f, _duration));
         }
 
         Debug.Log("Room changed");

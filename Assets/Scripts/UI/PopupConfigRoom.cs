@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -11,7 +11,6 @@ public class PopupConfigRoom : PopupController
 
     [SerializeField] TextMeshProUGUI _txtName;
     [SerializeField] TextMeshProUGUI _txtTotalPlayer;
-    int _totalPlayer = 3;
 
     public void OnClick(int index)
     {
@@ -22,14 +21,21 @@ public class PopupConfigRoom : PopupController
                 break;
 
             case BUTTON_CONFIRM:
+                //xài tmp_input field gặp bug
+                //https://discussions.unity.com/t/cannot-convert-inputfield-to-int/807904/12
                 string inputName = _txtName.text;
-                if (inputName.Length > 31)
-                {
-                    inputName = inputName.Substring(0, 31);
-                    Debug.Log("Trim string: " +  inputName);
-                }
+                string totalPlayer = _txtTotalPlayer.text.Replace("\u200B", "");
+                int maxPlayers;
+                if (int.TryParse(totalPlayer.Trim(), out maxPlayers))
+                    Debug.Log("Parse success");
+                else
+                    Debug.LogError("Invalid input: totalPlayer is not a valid number");
 
-                RoomManager.Instance.CreateRoom(inputName, _totalPlayer);
+                LobbyManager.Instance.CreateALobby(inputName, maxPlayers);
+                break;
+
+            case 2:
+                LobbyManager.Instance.ListLobby();
                 break;
         }
     }

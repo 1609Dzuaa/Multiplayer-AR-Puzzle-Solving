@@ -35,6 +35,11 @@ public class NotificationController : HintController
         _arrCallbacks = new UnityAction[3];
     }
 
+    private void Start()
+    {
+        //do nothing
+    }
+
     private void OnDestroy()
     {
         EventsManager.Instance.Unsubcribe(EventID.OnReceiveNotiParam, ReceiveParam);

@@ -20,7 +20,6 @@ public class UIManager : BaseSingleton<UIManager>
     [SerializeField] Transform _sceneTrans;
     [SerializeField] Transform _dimmedBG;
     [SerializeField] Transform _mainContent;
-    [SerializeField] Transform _chooseRole;
     [SerializeField] float _distance;
     [SerializeField] float _duration;
 
@@ -120,20 +119,5 @@ public class UIManager : BaseSingleton<UIManager>
             _stackPopupOrder.Pop().gameObject.SetActive(false);
         }
         _dimmedBG.gameObject.SetActive(false);
-    }
-
-    public void StartMainMenu()
-    {
-        float targetPos = _initPos.x + _distance;
-
-        _sceneTrans.DOLocalMoveX(targetPos, _duration).OnComplete(() =>
-        {
-            _chooseRole.gameObject.SetActive(false);
-            _mainContent.gameObject.SetActive(true);
-            _sceneTrans.DOLocalMoveX(targetPos + _distance, _duration).OnComplete(() =>
-            {
-                _sceneTrans.localPosition = _initPos;
-            });
-        });
     }
 }

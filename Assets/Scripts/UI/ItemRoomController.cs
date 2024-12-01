@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using Unity.Collections;
+using Unity.Services.Lobbies.Models;
 using UnityEngine;
 
 public class ItemRoomController : MonoBehaviour
@@ -9,16 +10,18 @@ public class ItemRoomController : MonoBehaviour
     [SerializeField] TextMeshProUGUI _txtID;
     [SerializeField] TextMeshProUGUI _txtName;
     [SerializeField] TextMeshProUGUI _txtTotalPlayer;
+    Lobby _lobby;
 
-    public void SetupRoom(FixedString32Bytes id, FixedString32Bytes name, int total, int maxPlayer)
+    public void SetupRoom(Lobby lobby)
     {
-        _txtID.text = id.ToString();
-        _txtName.text = name.ToString();
-        _txtTotalPlayer.text = total.ToString() + "/" + maxPlayer.ToString();
+        _lobby = lobby;
+        _txtID.text = lobby.Id;
+        _txtName.text = lobby.Name;
+        _txtTotalPlayer.text = lobby.Players.Count + "/" + lobby.MaxPlayers.ToString();
     }
 
     public void ButtonJoinOnClick()
     {
-        RoomManager.Instance.JoinRoom();
+        LobbyManager.Instance.JoinALobby(_lobby.Id);
     }
 }
