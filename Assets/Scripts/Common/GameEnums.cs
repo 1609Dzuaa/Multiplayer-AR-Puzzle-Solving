@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,6 +11,8 @@ public static class GameEnums
         OnReceiveNotiParam,
         OnReceiveQuestInfo,
         OnTrackedImageSuccess,
+        OnRefreshLobby,
+        OnCheckGameplayState, //lock/unlock gameplay dựa trên số ng
 
     }
 
@@ -23,6 +25,7 @@ public static class GameEnums
         PopupInformation = 4,
         PopupReward = 5,
         PopupLobby = 6,
+        PopupConfigRoom = 7,
 
     }
 

@@ -21,11 +21,12 @@ public class ButtonController : MonoBehaviour
         switch (index) 
         {
             case (int)ButtonIndex.Start:
-                if (!_sceneLoaded)
+                UIManager.Instance.TogglePopup(EPopupID.PopupLobby, true);
+                /*if (!_sceneLoaded)
                 {
                     _sceneLoaded = true;
                     EventsManager.Instance.Notify(EventID.OnStartGame);
-                }
+                }*/
                 break;
 
             case (int)ButtonIndex.Tutorial:

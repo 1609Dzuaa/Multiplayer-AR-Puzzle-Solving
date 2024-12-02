@@ -16,7 +16,7 @@ public class TrackedImageInfo : MonoBehaviour
     private void Awake()
     {
         _trackedImageManager = GetComponent<ARTrackedImageManager>();
-        EventsManager.Instance.Subcribe(EventID.OnTrackedImageSuccess, RemovePrefab);
+        EventsManager.Instance.Subscribe(EventID.OnTrackedImageSuccess, RemovePrefab);
 
         //mảng các obj sẽ spawn ra
         //trong script chest sẽ có SO của quest, dictionary bên này đổi khoá thành 
@@ -36,7 +36,7 @@ public class TrackedImageInfo : MonoBehaviour
 
     private void OnDestroy()
     {
-        EventsManager.Instance.Unsubcribe(EventID.OnTrackedImageSuccess, RemovePrefab);
+        EventsManager.Instance.Unsubscribe(EventID.OnTrackedImageSuccess, RemovePrefab);
     }
 
     private void RemovePrefab(object obj)
