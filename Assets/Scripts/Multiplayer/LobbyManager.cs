@@ -8,19 +8,18 @@ using Unity.Services.Core.Environments;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
+using static GameConst;
 using static GameEnums;
 
 public class LobbyManager : BaseSingleton<LobbyManager>
 {
     private Lobby _hostLobby, _joinedLobby;
     float _heartBeatTimer;
-    float _lobbyUpdateTimer;
 
     const int DEFAULT_CURRENT_TOTAL_PLAYER = 1;
     const int DEFAULT_MAX_PLAYER = 5;
-    const int DEFAULT_TOTAL_PLAYER_TO_PLAY = 3;
 
-    private async void Start()
+    protected async override void Awake()
     {
         await UnityServices.InitializeAsync(new InitializationOptions().SetEnvironmentName("production"));
 
@@ -29,14 +28,15 @@ public class LobbyManager : BaseSingleton<LobbyManager>
             Debug.Log("Signed in " + AuthenticationService.Instance.PlayerId);
         };
 
-
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
+
+        RelayManager.Instance.CreateRelay();
     }
 
     private void Update()
     {
         HandleLobbyHeartBeat();
-        HandleLobbyPollForUpdates();
+        //HandleLobbyPollForUpdates();
     }
 
     private async void HandleLobbyHeartBeat()
@@ -88,7 +88,25 @@ public class LobbyManager : BaseSingleton<LobbyManager>
 
                 _hostLobby = lobby;
                 _joinedLobby = _hostLobby;
-                Debug.Log("lobby created: " + lobbyName + ", Players: " + maxPlayers + ", " + lobby.Id + ", " + lobby.LobbyCode);
+                
+                //assign callbacks for upcoming Lobby updates
+                var callback = new LobbyEventCallbacks();
+                callback.LobbyChanged += OnLobbyChanged;
+                try
+                {
+                    await Lobbies.Instance.SubscribeToLobbyEventsAsync(_joinedLobby.Id, callback);
+                }
+                catch (LobbyServiceException ex)
+                {
+                    switch (ex.Reason)
+                    {
+                        case LobbyExceptionReason.AlreadySubscribedToLobby: Debug.LogWarning($"Already subscribed to lobby[{_hostLobby.Name}]. We did not need to try and subscribe again. Exception Message: {ex.Message}"); break;
+                        case LobbyExceptionReason.SubscriptionToLobbyLostWhileBusy: Debug.LogError($"Subscription to lobby events was lost while it was busy trying to subscribe. Exception Message: {ex.Message}"); throw;
+                        case LobbyExceptionReason.LobbyEventServiceConnectionError: Debug.LogError($"Failed to connect to lobby events. Exception Message: {ex.Message}"); throw;
+                        default: throw;
+                    }
+                }
+                //Debug.Log("lobby created: " + lobbyName + ", Players: " + maxPlayers + ", " + lobby.Id + ", " + lobby.LobbyCode);
 
                 string content = "Create Lobby Success!";
                 SwitchToMainScene(content);
@@ -97,6 +115,20 @@ public class LobbyManager : BaseSingleton<LobbyManager>
             {
                 Debug.Log(ex);
             }
+        }
+    }
+
+    private void OnLobbyChanged(ILobbyChanges changes)
+    {
+        if (changes.LobbyDeleted)
+        {
+            
+        }
+        else
+        {
+            changes.ApplyToLobby(_joinedLobby);
+            Debug.Log("OnLobbyChanged");
+            EventsManager.Instance.Notify(EventID.OnCheckGameplayState, _joinedLobby);
         }
     }
 
@@ -110,7 +142,7 @@ public class LobbyManager : BaseSingleton<LobbyManager>
 
     private void TweenSwitchScene()
     {
-        EventsManager.Instance.Notify(EventID.OnStartGame);
+        EventsManager.Instance.Notify(EventID.OnStartGame, _joinedLobby);
     }
 
     public void CreateALobby(string lobbyName, int maxPlayers)
@@ -167,10 +199,13 @@ public class LobbyManager : BaseSingleton<LobbyManager>
             QueryResponse queryResponse = await Lobbies.Instance.QueryLobbiesAsync();
 
             string cleanedLobbylobbyID = lobbyID.Trim().Replace("\u200B", "");
-            await Lobbies.Instance.JoinLobbyByIdAsync(lobbyID);//JoinLobbyByIDAsync(cleanedLobbyCode);
+            Lobby lobby = await Lobbies.Instance.JoinLobbyByIdAsync(lobbyID);//JoinLobbyByIDAsync(cleanedLobbyCode);
+            _joinedLobby = lobby;
 
-            string content = "Join Lobby Success";
-            SwitchToMainScene(content);
+            TweenSwitchScene();
+            //string content = "Join Lobby Success";
+            //SwitchToMainScene(content);
+            //EventsManager.Instance.Notify(EventID.OnCheckGameplayState, _joinedLobby);
             Debug.Log("join success: " + cleanedLobbylobbyID);
         }
         catch (LobbyServiceException ex)
@@ -179,21 +214,22 @@ public class LobbyManager : BaseSingleton<LobbyManager>
         }
     }
 
-    private async void HandleLobbyPollForUpdates()
+    /*private async void HandleLobbyPollForUpdates()
     {
         if (_joinedLobby != null)
         {
             _lobbyUpdateTimer -= Time.deltaTime;
             if (_lobbyUpdateTimer <= 0f)
             {
-                float lobbyUpdateTimerMax = 1.1f;
+                float lobbyUpdateTimerMax = 1.5f;
                 _lobbyUpdateTimer = lobbyUpdateTimerMax;
 
                 Lobby lobby = await LobbyService.Instance.GetLobbyAsync(_joinedLobby.Id);
                 _joinedLobby = lobby;
+                EventsManager.Instance.Notify(EventID.OnCheckGameplayState, _joinedLobby);
             }
         }
-    }
+    }*/
 
     public void RefreshLobbies()
     {

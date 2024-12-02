@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,6 +12,7 @@ public static class GameEnums
         OnReceiveQuestInfo,
         OnTrackedImageSuccess,
         OnRefreshLobby,
+        OnCheckGameplayState, //lock/unlock gameplay dựa trên số ng
 
     }
 

@@ -10,7 +10,7 @@ public class RewardController : HintController
 
     private void Awake()
     {
-        EventsManager.Instance.Subcribe(EventID.OnTrackedImageSuccess, ReceiveData);
+        EventsManager.Instance.Subscribe(EventID.OnTrackedImageSuccess, ReceiveData);
     }
 
     private void Start()
@@ -20,7 +20,7 @@ public class RewardController : HintController
 
     private void OnDestroy()
     {
-        EventsManager.Instance.Unsubcribe(EventID.OnTrackedImageSuccess, ReceiveData);
+        EventsManager.Instance.Unsubscribe(EventID.OnTrackedImageSuccess, ReceiveData);
     }
 
     private void ReceiveData(object obj)

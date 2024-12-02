@@ -203,11 +203,12 @@ MonoBehaviour:
   m_text: 'Version 1.0.0
 
     Technologies: Unity AR Foundation, Unity Netcode, Unity
-    Engine.
+    Engine, Lobby & Relay Services.
 
     Language: C#.
 
-    Project Management: Github, Notion.'
+    Project Management: Github,
+    Notion.'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: eaa8615fe26a04e49a30d6f37a6b4954, type: 2}
   m_sharedMaterial: {fileID: -4001293270552118757, guid: eaa8615fe26a04e49a30d6f37a6b4954,

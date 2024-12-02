@@ -8,15 +8,25 @@ public class EventsManager : BaseSingleton<EventsManager>
 {
     private Dictionary<EventID, Action<object>> _dictEvents = new Dictionary<EventID, Action<object>>();
 
-    public void Subcribe(EventID eventID, Action<object> callback)
-    {
-        if (!_dictEvents.ContainsKey(eventID))
-            _dictEvents.Add(eventID, callback);
+    private Action<object> OnStartGame;
+    private Action<object> OnCheckGameplayState;
 
-        _dictEvents[eventID] += callback;
+    protected override void Awake()
+    {
+        base.Awake();
+        //_dictEvents.Add(EventID.OnStartGame, OnStartGame);
+        //_dictEvents.Add(EventID.OnCheckGameplayState, OnCheckGameplayState);
     }
 
-    public void Unsubcribe(EventID eventID, Action<object> callback)
+    public void Subscribe(EventID eventID, Action<object> callback)
+    {
+        if (!_dictEvents.ContainsKey(eventID))
+            _dictEvents[eventID] = callback;
+        else
+            _dictEvents[eventID] += callback;
+    }
+
+    public void Unsubscribe(EventID eventID, Action<object> callback)
     {
         if (_dictEvents.ContainsKey(eventID))
             _dictEvents[eventID] -= callback;

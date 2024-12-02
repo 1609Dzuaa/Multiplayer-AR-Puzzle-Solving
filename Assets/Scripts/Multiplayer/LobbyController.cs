@@ -19,7 +19,7 @@ public class LobbyController : NetworkBehaviour
 
     private void Awake()
     {
-        EventsManager.Instance.Subcribe(EventID.OnRefreshLobby, RefreshLobbyList);
+        EventsManager.Instance.Subscribe(EventID.OnRefreshLobby, RefreshLobbyList);
     }
 
     private void OnEnable()
@@ -35,7 +35,7 @@ public class LobbyController : NetworkBehaviour
     public override void OnDestroy()
     {
         base.OnDestroy();
-        EventsManager.Instance.Unsubcribe(EventID.OnRefreshLobby, RefreshLobbyList);
+        EventsManager.Instance.Unsubscribe(EventID.OnRefreshLobby, RefreshLobbyList);
     }
 
     private void Update()

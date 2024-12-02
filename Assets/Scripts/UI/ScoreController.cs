@@ -15,12 +15,12 @@ public class ScoreController : MonoBehaviour
     private void Start()
     {
         _txtScore = GetComponent<TextMeshProUGUI>();
-        EventsManager.Instance.Subcribe(EventID.OnTrackedImageSuccess, AddScore);
+        EventsManager.Instance.Subscribe(EventID.OnTrackedImageSuccess, AddScore);
     }
 
     private void OnDestroy()
     {
-        EventsManager.Instance.Unsubcribe(EventID.OnTrackedImageSuccess, AddScore);
+        EventsManager.Instance.Unsubscribe(EventID.OnTrackedImageSuccess, AddScore);
     }
 
     private void AddScore(object obj)
