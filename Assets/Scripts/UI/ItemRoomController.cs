@@ -4,6 +4,7 @@ using TMPro;
 using Unity.Collections;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
+using static GameEnums;
 
 public class ItemRoomController : MonoBehaviour
 {
@@ -23,5 +24,7 @@ public class ItemRoomController : MonoBehaviour
     public void ButtonJoinOnClick()
     {
         LobbyManager.Instance.JoinALobby(_lobby.Id);
+        //UIManager.Instance.TogglePopup(EPopupID.PopupEnterCode, true);
+        //EventsManager.Instance.Notify(EventID.OnRefreshLobby, _lobby);
     }
 }

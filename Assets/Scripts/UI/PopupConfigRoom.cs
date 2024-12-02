@@ -11,6 +11,7 @@ public class PopupConfigRoom : PopupController
 
     [SerializeField] TextMeshProUGUI _txtName;
     [SerializeField] TextMeshProUGUI _txtTotalPlayer;
+    [SerializeField] TMP_Dropdown _dropdown;
 
     public void OnClick(int index)
     {
@@ -30,6 +31,10 @@ public class PopupConfigRoom : PopupController
                     Debug.Log("Parse success");
                 else
                     Debug.LogError("Invalid input: totalPlayer is not a valid number");
+
+                int indexDropdown = _dropdown.value;
+                string selectedOption = _dropdown.options[indexDropdown].text;
+                Debug.Log("Val: " + selectedOption);
 
                 LobbyManager.Instance.CreateALobby(inputName, maxPlayers);
                 break;

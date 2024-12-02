@@ -15,9 +15,11 @@ public class LobbyManager : BaseSingleton<LobbyManager>
 {
     private Lobby _hostLobby, _joinedLobby;
     float _heartBeatTimer;
+    bool _isRelayConnected = false;
 
     const int DEFAULT_CURRENT_TOTAL_PLAYER = 1;
     const int DEFAULT_MAX_PLAYER = 5;
+    const string KEY_RELAY_CODE = "RelayCode";
 
     protected async override void Awake()
     {
@@ -30,7 +32,7 @@ public class LobbyManager : BaseSingleton<LobbyManager>
 
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
 
-        RelayManager.Instance.CreateRelay();
+        //RelayManager.Instance.CreateRelay();
     }
 
     private void Update()
@@ -85,9 +87,28 @@ public class LobbyManager : BaseSingleton<LobbyManager>
                 };
 
                 Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, createLobbyOptions);
+                string relayCode = await RelayManager.Instance.CreateRelay();
 
                 _hostLobby = lobby;
                 _joinedLobby = _hostLobby;
+
+                try
+                {
+                    Lobby updateLobby = await Lobbies.Instance.UpdateLobbyAsync(_joinedLobby.Id, new UpdateLobbyOptions
+                    {
+                            Data = new Dictionary<string, DataObject>
+                        {
+                            { KEY_RELAY_CODE, new DataObject(DataObject.VisibilityOptions.Member, relayCode) }
+                        }
+                    });
+                    _joinedLobby = updateLobby;
+
+                    Debug.Log("relay: " + _joinedLobby.Data[KEY_RELAY_CODE].Value);
+                }
+                catch(LobbyServiceException ex)
+                {
+                    Debug.LogException(ex);
+                }
                 
                 //assign callbacks for upcoming Lobby updates
                 var callback = new LobbyEventCallbacks();
@@ -129,6 +150,14 @@ public class LobbyManager : BaseSingleton<LobbyManager>
             changes.ApplyToLobby(_joinedLobby);
             Debug.Log("OnLobbyChanged");
             EventsManager.Instance.Notify(EventID.OnCheckGameplayState, _joinedLobby);
+
+            //có thằng join
+            if (changes.PlayerJoined.Changed && !_isRelayConnected)
+            {
+                _isRelayConnected = true;
+                RelayManager.Instance.JoinRelay(_joinedLobby.Data[KEY_RELAY_CODE].Value);
+                Debug.Log("Join Relay Success: " + _joinedLobby.Data[KEY_RELAY_CODE].Value);
+            }
         }
     }
 

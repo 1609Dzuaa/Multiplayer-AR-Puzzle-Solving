@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Services.Relay;
@@ -9,7 +10,7 @@ using static GameConst;
 
 public class RelayManager : BaseSingleton<RelayManager>
 {
-    public async void CreateRelay()
+    public async Task<string> CreateRelay()
     {
         try
         {
@@ -29,14 +30,17 @@ public class RelayManager : BaseSingleton<RelayManager>
                 );
 
             NetworkManager.Singleton.StartHost();
+
+            return joinCode;
         }
         catch (RelayServiceException ex)
         {
             Debug.LogException(ex);
+            return "";
         }
     }
 
-    private async void JoinRelay(string joinCode)
+    public async void JoinRelay(string joinCode)
     {
         try
         {
