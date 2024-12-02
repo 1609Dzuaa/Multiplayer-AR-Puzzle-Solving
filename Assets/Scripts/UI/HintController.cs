@@ -17,14 +17,14 @@ public class HintController : PopupController
 
     private void Start()
     {
-        EventsManager.Instance.Subcribe(EventID.OnTrackedImageSuccess, GetNextQuest);
+        EventsManager.Instance.Subscribe(EventID.OnTrackedImageSuccess, GetNextQuest);
         _currentQuest = QuestManager.Instance.GetRandomQuest();
         _txtHint.text = (_currentQuest != null) ? _currentQuest.Hint : "No Hint Left";
     }
 
     private void OnDestroy()
     {
-        EventsManager.Instance.Unsubcribe(EventID.OnTrackedImageSuccess, GetNextQuest);
+        EventsManager.Instance.Unsubscribe(EventID.OnTrackedImageSuccess, GetNextQuest);
     }
 
     private void GetNextQuest(object obj = null)

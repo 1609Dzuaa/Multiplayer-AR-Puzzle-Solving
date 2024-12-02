@@ -18,7 +18,7 @@ public class ChestInteraction : MonoBehaviour
 
     private void Awake()
     {
-        EventsManager.Instance.Subcribe(EventID.OnReceiveQuestInfo, ReceiveQuestInfo);
+        EventsManager.Instance.Subscribe(EventID.OnReceiveQuestInfo, ReceiveQuestInfo);
     }
 
     void Start()
@@ -29,7 +29,7 @@ public class ChestInteraction : MonoBehaviour
 
     private void OnDestroy()
     {
-        EventsManager.Instance.Unsubcribe(EventID.OnReceiveQuestInfo, ReceiveQuestInfo);
+        EventsManager.Instance.Unsubscribe(EventID.OnReceiveQuestInfo, ReceiveQuestInfo);
     }
 
     private void ReceiveQuestInfo(object obj)

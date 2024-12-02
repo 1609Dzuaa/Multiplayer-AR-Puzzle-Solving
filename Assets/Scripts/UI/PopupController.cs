@@ -31,9 +31,9 @@ public class PopupController : MonoBehaviour
         transform.DOScale(1.0f, _popupDuration).OnComplete(TweenChildComponent);
     }
 
-    public void TweenPopupOff(TweenCallback callback)
+    public void TweenPopupOff(TweenCallback callbackOnCompleted)
     {
-        transform.DOScale(0.0f, _popupDuration).OnComplete(callback.Invoke);
+        transform.DOScale(0.0f, _popupDuration).OnComplete(callbackOnCompleted.Invoke);
     }
 
     protected virtual void TweenChildComponent()
