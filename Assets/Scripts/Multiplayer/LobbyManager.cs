@@ -20,10 +20,13 @@ public class LobbyManager : BaseSingleton<LobbyManager>
     const int DEFAULT_CURRENT_TOTAL_PLAYER = 1;
     const int DEFAULT_MAX_PLAYER = 5;
     const string KEY_RELAY_CODE = "RelayCode";
+    const string KEY_PLAYER_NAME = "PlayerName";
 
     protected async override void Awake()
     {
-        await UnityServices.InitializeAsync(new InitializationOptions().SetEnvironmentName("production"));
+        base.Awake();
+
+        await UnityServices.InitializeAsync();
 
         AuthenticationService.Instance.SignedIn += () =>
         {
@@ -78,12 +81,19 @@ public class LobbyManager : BaseSingleton<LobbyManager>
         }
         else
         {
+            string defaultName = "UIT";
             try
             {
                 CreateLobbyOptions createLobbyOptions = new CreateLobbyOptions
                 {
-                    //IsPrivate = true,
-
+                    IsPrivate = false,
+                    Player = new Player
+                    {
+                        Data = new Dictionary<string, PlayerDataObject>
+                        {
+                            { KEY_PLAYER_NAME, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, defaultName) }
+                        }
+                    }
                 };
 
                 Lobby lobby = await LobbyService.Instance.CreateLobbyAsync(lobbyName, maxPlayers, createLobbyOptions);
@@ -103,13 +113,13 @@ public class LobbyManager : BaseSingleton<LobbyManager>
                     });
                     _joinedLobby = updateLobby;
 
-                    Debug.Log("relay: " + _joinedLobby.Data[KEY_RELAY_CODE].Value);
+                    //Debug.Log("relay: " + _joinedLobby.Data[KEY_RELAY_CODE].Value);
                 }
                 catch(LobbyServiceException ex)
                 {
                     Debug.LogException(ex);
                 }
-                
+
                 //assign callbacks for upcoming Lobby updates
                 var callback = new LobbyEventCallbacks();
                 callback.LobbyChanged += OnLobbyChanged;
@@ -148,7 +158,7 @@ public class LobbyManager : BaseSingleton<LobbyManager>
         else
         {
             changes.ApplyToLobby(_joinedLobby);
-            Debug.Log("OnLobbyChanged");
+            //Debug.Log("OnLobbyChanged");
             EventsManager.Instance.Notify(EventID.OnCheckGameplayState, _joinedLobby);
 
             //có thằng join
@@ -156,7 +166,7 @@ public class LobbyManager : BaseSingleton<LobbyManager>
             {
                 _isRelayConnected = true;
                 RelayManager.Instance.JoinRelay(_joinedLobby.Data[KEY_RELAY_CODE].Value);
-                Debug.Log("Join Relay Success: " + _joinedLobby.Data[KEY_RELAY_CODE].Value);
+                //Debug.Log("Join Relay Success: " + _joinedLobby.Data[KEY_RELAY_CODE].Value);
             }
         }
     }
@@ -227,15 +237,28 @@ public class LobbyManager : BaseSingleton<LobbyManager>
         {
             QueryResponse queryResponse = await Lobbies.Instance.QueryLobbiesAsync();
 
-            string cleanedLobbylobbyID = lobbyID.Trim().Replace("\u200B", "");
-            Lobby lobby = await Lobbies.Instance.JoinLobbyByIdAsync(lobbyID);//JoinLobbyByIDAsync(cleanedLobbyCode);
+            //string cleanedLobbylobbyID = lobbyID.Trim().Replace("\u200B", "");
+
+            JoinLobbyByIdOptions options = new JoinLobbyByIdOptions
+            {
+                Player = new Player
+                {
+                    Data = new Dictionary<string, PlayerDataObject>
+                        {
+                            { KEY_PLAYER_NAME, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, "UIT") }
+                        }
+                }
+            };
+
+            Lobby lobby = await Lobbies.Instance.JoinLobbyByIdAsync(lobbyID, options);//JoinLobbyByIDAsync(cleanedLobbyCode);
             _joinedLobby = lobby;
+            //SetPlayerProfile("DefaultName");
 
             TweenSwitchScene();
             //string content = "Join Lobby Success";
             //SwitchToMainScene(content);
             //EventsManager.Instance.Notify(EventID.OnCheckGameplayState, _joinedLobby);
-            Debug.Log("join success: " + cleanedLobbylobbyID);
+            //Debug.Log("join success: " + cleanedLobbylobbyID);
         }
         catch (LobbyServiceException ex)
         {
@@ -296,4 +319,50 @@ public class LobbyManager : BaseSingleton<LobbyManager>
             Debug.Log(ex);
         }
     }
+
+    public async void CreateNameInLobby(string playerName)
+    {
+        string keyName = AuthenticationService.Instance.PlayerId;
+
+        Player player = _joinedLobby.Players.Find(x => x.Data[KEY_PLAYER_NAME].Value == playerName);
+
+        if (player != null)
+        {
+            string content = "The name " + playerName + " is already exist in Lobby, choose another name!";
+            NotificationParam param = new NotificationParam(content, () => { UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false); });
+            EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
+            return;
+        }
+
+        UpdatePlayerOptions playerOptions = new UpdatePlayerOptions
+        {
+            Data = new Dictionary<string, PlayerDataObject>
+                {
+                    { KEY_PLAYER_NAME, new PlayerDataObject(PlayerDataObject.VisibilityOptions.Member, playerName) }
+                }
+        };
+
+        try
+        {
+            Lobby updatedLobby = await Lobbies.Instance.UpdatePlayerAsync(_joinedLobby.Id, keyName, playerOptions);
+
+            if (updatedLobby != null)
+            {
+                /*string successMessage = "Your name has been updated successfully!";
+                NotificationParam successParam = new NotificationParam(successMessage, () => { UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false); });
+                EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, successParam);*/
+
+                EventsManager.Instance.Notify(EventID.OnCanPlay);
+                _joinedLobby = updatedLobby;
+
+                foreach (var p in _joinedLobby.Players)
+                    Debug.Log("Lobby " + _joinedLobby.Name + ", Player: " + p.Data[KEY_PLAYER_NAME].Value);
+            }
+        }
+        catch (LobbyServiceException ex)
+        {
+            Debug.Log(ex);
+        }
+    }
+
 }

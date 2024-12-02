@@ -13,6 +13,7 @@ public static class GameEnums
         OnTrackedImageSuccess,
         OnRefreshLobby,
         OnCheckGameplayState, //lock/unlock gameplay dựa trên số ng
+        OnCanPlay, //bắn sau khi đã đặt tên thành công
 
     }
 
@@ -26,6 +27,7 @@ public static class GameEnums
         PopupReward = 5,
         PopupLobby = 6,
         PopupConfigRoom = 7,
+        PopupEnterName = 8,
 
     }
 

@@ -6,7 +6,7 @@ using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using static GameEnums;
 
-public class LobbyController : NetworkBehaviour
+public class LobbyController : MonoBehaviour
 {
     [SerializeField] ItemRoomController _itemRoomPrefab;
     [SerializeField] Transform _contentRoom; //nơi chứa các prefabRoom
@@ -32,9 +32,9 @@ public class LobbyController : NetworkBehaviour
         LobbyManager.Instance.RefreshLobbies();
     }
 
-    public override void OnDestroy()
+    private void OnDestroy()
     {
-        base.OnDestroy();
+        //base.OnDestroy();
         EventsManager.Instance.Unsubscribe(EventID.OnRefreshLobby, RefreshLobbyList);
     }
 
@@ -68,6 +68,6 @@ public class LobbyController : NetworkBehaviour
             sequence.Append(newRoom.transform.DOScale(1.0f, _duration));
         }
 
-        Debug.Log("Room changed");
+        //Debug.Log("Room changed");
     }
 }
