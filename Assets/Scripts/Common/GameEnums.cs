@@ -14,6 +14,7 @@ public static class GameEnums
         OnRefreshLobby,
         OnCheckGameplayState, //lock/unlock gameplay dựa trên số ng
         OnCanPlay, //bắn sau khi đã đặt tên thành công
+        OnRefreshLeaderboard,
 
     }
 

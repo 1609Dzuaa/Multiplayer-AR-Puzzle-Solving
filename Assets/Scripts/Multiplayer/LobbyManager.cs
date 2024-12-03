@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.Netcode;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
 using Unity.Services.Core.Environments;
@@ -11,16 +12,12 @@ using UnityEngine;
 using static GameConst;
 using static GameEnums;
 
-public class LobbyManager : BaseSingleton<LobbyManager>
+public class LobbyManager : NetworkSingleton<LobbyManager>
 {
     private Lobby _hostLobby, _joinedLobby;
+    private PlayerData _playerData;
     float _heartBeatTimer;
     bool _isRelayConnected = false;
-
-    const int DEFAULT_CURRENT_TOTAL_PLAYER = 1;
-    const int DEFAULT_MAX_PLAYER = 5;
-    const string KEY_RELAY_CODE = "RelayCode";
-    const string KEY_PLAYER_NAME = "PlayerName";
 
     protected async override void Awake()
     {
@@ -111,9 +108,8 @@ public class LobbyManager : BaseSingleton<LobbyManager>
                             { KEY_RELAY_CODE, new DataObject(DataObject.VisibilityOptions.Member, relayCode) }
                         }
                     });
-                    _joinedLobby = updateLobby;
 
-                    //Debug.Log("relay: " + _joinedLobby.Data[KEY_RELAY_CODE].Value);
+                    _joinedLobby = updateLobby;
                 }
                 catch(LobbyServiceException ex)
                 {
@@ -149,6 +145,13 @@ public class LobbyManager : BaseSingleton<LobbyManager>
         }
     }
 
+    [ClientRpc]
+    private void UpdateListPlayerClientRpc()
+    {
+        if (IsClient)
+            Debug.Log("Tao duoc goi o client ne");
+    }
+
     private void OnLobbyChanged(ILobbyChanges changes)
     {
         if (changes.LobbyDeleted)
@@ -157,8 +160,8 @@ public class LobbyManager : BaseSingleton<LobbyManager>
         }
         else
         {
+            UpdateListPlayerClientRpc();
             changes.ApplyToLobby(_joinedLobby);
-            //Debug.Log("OnLobbyChanged");
             EventsManager.Instance.Notify(EventID.OnCheckGameplayState, _joinedLobby);
 
             //có thằng join
@@ -166,7 +169,7 @@ public class LobbyManager : BaseSingleton<LobbyManager>
             {
                 _isRelayConnected = true;
                 RelayManager.Instance.JoinRelay(_joinedLobby.Data[KEY_RELAY_CODE].Value);
-                //Debug.Log("Join Relay Success: " + _joinedLobby.Data[KEY_RELAY_CODE].Value);
+                Debug.Log("Join Relay when lobby changes: ");
             }
         }
     }
@@ -252,13 +255,8 @@ public class LobbyManager : BaseSingleton<LobbyManager>
 
             Lobby lobby = await Lobbies.Instance.JoinLobbyByIdAsync(lobbyID, options);//JoinLobbyByIDAsync(cleanedLobbyCode);
             _joinedLobby = lobby;
-            //SetPlayerProfile("DefaultName");
 
             TweenSwitchScene();
-            //string content = "Join Lobby Success";
-            //SwitchToMainScene(content);
-            //EventsManager.Instance.Notify(EventID.OnCheckGameplayState, _joinedLobby);
-            //Debug.Log("join success: " + cleanedLobbylobbyID);
         }
         catch (LobbyServiceException ex)
         {
@@ -352,7 +350,8 @@ public class LobbyManager : BaseSingleton<LobbyManager>
                 NotificationParam successParam = new NotificationParam(successMessage, () => { UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false); });
                 EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, successParam);*/
 
-                EventsManager.Instance.Notify(EventID.OnCanPlay);
+                _playerData = new PlayerData(playerName, DEFAULT_SCORE);
+                EventsManager.Instance.Notify(EventID.OnCanPlay, _playerData);
                 _joinedLobby = updatedLobby;
 
                 foreach (var p in _joinedLobby.Players)

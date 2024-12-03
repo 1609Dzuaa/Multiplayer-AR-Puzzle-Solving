@@ -13,8 +13,6 @@ public enum ButtonIndex
 
 public class ButtonController : MonoBehaviour
 {
-    bool _sceneLoaded = false;
-
     public void OnClick(int index)
     {
         SoundsManager.Instance.PlaySfx(ESoundName.Button1SFX);
@@ -22,11 +20,6 @@ public class ButtonController : MonoBehaviour
         {
             case (int)ButtonIndex.Start:
                 UIManager.Instance.TogglePopup(EPopupID.PopupLobby, true);
-                /*if (!_sceneLoaded)
-                {
-                    _sceneLoaded = true;
-                    EventsManager.Instance.Notify(EventID.OnStartGame);
-                }*/
                 break;
 
             case (int)ButtonIndex.Tutorial:

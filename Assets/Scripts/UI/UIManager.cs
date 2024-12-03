@@ -115,7 +115,8 @@ public class UIManager : BaseSingleton<UIManager>
         {
             if (lobbyJoined.Players.Count >= DEFAULT_TOTAL_PLAYER_TO_PLAY)
             {
-                TogglePopup(EPopupID.PopupInformation, false);
+                if (_dictPopups[EPopupID.PopupInformation].activeInHierarchy)
+                    TogglePopup(EPopupID.PopupInformation, false);
                 TogglePopup(EPopupID.PopupEnterName, true);
 
                 //for (int i = 0; i < _arrARComponents.Length; i++)
@@ -131,7 +132,7 @@ public class UIManager : BaseSingleton<UIManager>
             }
         }
 
-        Debug.Log("check state");
+        //Debug.Log("check state");
     }
 
     private void AllowToPlay(object obj)
@@ -139,8 +140,9 @@ public class UIManager : BaseSingleton<UIManager>
         for (int i = 0; i < _arrARComponents.Length; i++)
             _arrARComponents[i].gameObject.SetActive(true);
 
-        HideAllCurrentPopups();
-        //Debug.Log("stack: " + _stackPopupOrder.Count);
+        TogglePopup(EPopupID.PopupEnterName, false);
+        
+        Debug.Log("stack: " + _stackPopupOrder.Count);
         //if (_stackPopupOrder.Count > 0)
             //TogglePopup(EPopupID.PopupInformation, false);
     }
