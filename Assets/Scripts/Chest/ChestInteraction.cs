@@ -91,8 +91,8 @@ public class ChestInteraction : MonoBehaviour
     public void PopupReward()
     {
         //gửi thông tin của quest ở đây
-        //audio của 1 trong 3 thằng đang bị disable đầu game
-        QuestManager.Instance.RemoveQuest(_questInfo);
+        //track thành công thì bắn thông tin đi;
+        QuestManager.Instance.RemoveQuest();
         EventsManager.Instance.Notify(EventID.OnTrackedImageSuccess, _questInfo);
         UIManager.Instance.TogglePopup(EPopupID.PopupReward, true);
         //QuestManager.Instance.RemoveQuest(_questInfo);

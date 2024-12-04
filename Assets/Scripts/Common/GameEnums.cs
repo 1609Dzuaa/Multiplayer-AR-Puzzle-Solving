@@ -15,6 +15,7 @@ public static class GameEnums
         OnCheckGameplayState, //lock/unlock gameplay dựa trên số ng
         OnCanPlay, //bắn sau khi đã đặt tên thành công
         OnRefreshLeaderboard,
+        OnUpdatePlayerData, //gửi thông tin player để cập nhật bxh
 
     }
 

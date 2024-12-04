@@ -191,28 +191,4 @@ public class UIManager : BaseSingleton<UIManager>
         }
         _dimmedBG.gameObject.SetActive(false);
     }
-
-    /*public async void ListenForUpdates()
-    {
-        try
-        {
-            while (currentLobby != null)
-            {
-                currentLobby = await LobbyService.Instance.GetLobbyAsync(currentLobby.Id);
-                foreach (var player in currentLobby.Players)
-                {
-                    if (player.Data.ContainsKey("CustomData"))
-                    {
-                        string customData = player.Data["CustomData"].Value;
-                        Debug.Log($"Received data from player: {customData}");
-                    }
-                }
-                await Task.Delay(3000); // Lặp lại sau 3 giây
-            }
-        }
-        catch (LobbyServiceException e)
-        {
-            Debug.LogError(e);
-        }
-    }*/
 }

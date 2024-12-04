@@ -14,15 +14,22 @@ using static GameEnums;
 
 public class LobbyManager : NetworkSingleton<LobbyManager>
 {
-    private Lobby _hostLobby, _joinedLobby;
-    private PlayerData _playerData;
+    Lobby _hostLobby, _joinedLobby;
+    //public PlayerData PlayerData;
     float _heartBeatTimer;
     bool _isRelayConnected = false;
-    private NetworkList<PlayerData> _listPlayers;
+    NetworkList<PlayerData> _listPlayers;
+    int _playerIndex = 0;
+
+    #region Init & Destroy
 
     protected async override void Awake()
     {
         base.Awake();
+        _listPlayers = new NetworkList<PlayerData>();
+        _listPlayers.OnListChanged += ListPlayersOnChanged;
+        //_playerIndex.OnValueChanged += OnSomeValueChanged;
+        EventsManager.Instance.Subscribe(EventID.OnUpdatePlayerData, UpdatePlayerData);
 
         await UnityServices.InitializeAsync();
 
@@ -32,11 +39,17 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         };
 
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
-
-        _listPlayers = new NetworkList<PlayerData>();
-        _listPlayers.OnListChanged += ListPlayersOnChanged;
         //RelayManager.Instance.CreateRelay();
     }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+        _listPlayers.OnListChanged -= ListPlayersOnChanged;
+        EventsManager.Instance.Unsubscribe(EventID.OnUpdatePlayerData, UpdatePlayerData);
+    }
+
+    #endregion
 
     #region Ownership
     /// <summary>
@@ -65,16 +78,6 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     }
     #endregion
 
-    public override void OnNetworkSpawn()
-    {
-        base.OnNetworkSpawn();
-
-        if (IsClient)
-        {
-            Debug.Log("Client has joined.");
-        }
-    }
-
     private void ListPlayersOnChanged(NetworkListEvent<PlayerData> changeEvent)
     {
         //chuyển đổi vì Netcode kh hỗ trợ serialization NetworkList
@@ -88,9 +91,29 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         Debug.Log("List changed");
     }
 
+    private void UpdatePlayerData(object obj)
+    {
+        PlayerData playerData = (PlayerData)obj;
+        if (IsServer)
+        {
+            Debug.Log("server update player");
+            UpdatePlayer(playerData, _playerIndex);
+        }
+        else if (IsOwner)
+        {
+            Debug.Log("client update player");
+            UpdatePlayerDataServerRpc(playerData, _playerIndex);
+        }
+    }
+
+    #region Lobby's Hearbeat
+
     private void Update()
     {
         HandleLobbyHeartBeat();
+        if (_listPlayers != null)
+            foreach (var p in _listPlayers)
+                Debug.Log("name, scr: " + p.Name + ", " + p.Score);
         //HandleLobbyPollForUpdates();
     }
 
@@ -108,6 +131,8 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
             }
         }
     }
+
+    #endregion
 
     private async void CreateLobby(string lobbyName, int maxPlayers)
     {
@@ -151,6 +176,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
 
                 _hostLobby = lobby;
                 _joinedLobby = _hostLobby;
+                _playerIndex = INDEX_OF_HOST;
 
                 try
                 {
@@ -207,11 +233,35 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     }
 
     [ServerRpc]
-    private void SendPlayerDataServerRpc(PlayerData data)
+    private void SendPlayerDataServerRpc(PlayerData data, ulong clientId)
     {
         //EventsManager.Instance.Notify(EventID.OnCanPlay, data);
+        //playerIndex = _listPlayers.Count;
+        UpdatePlayerIndexClientRpc(_listPlayers.Count, clientId);
         _listPlayers.Add(data);
         Debug.Log("add " +  data.Name);
+    }
+
+    [ClientRpc]
+    private void UpdatePlayerIndexClientRpc(int playerIndex, ulong clientId)
+    {
+        if (NetworkManager.Singleton.LocalClientId == clientId)
+            _playerIndex = playerIndex;
+    }
+
+    [ServerRpc]
+    private void UpdatePlayerDataServerRpc(PlayerData data, int playerIndex)
+    {
+        UpdatePlayer(data, playerIndex);
+        //Debug.Log("Update Data");
+    }
+
+    private void UpdatePlayer(PlayerData data, int playerIndex)
+    {
+        Debug.Log("player, index: " + data.Name + ", " + playerIndex);
+        _listPlayers[playerIndex] = data;
+        foreach (var player in _listPlayers)
+            Debug.Log("name, score: " + player.Name + ", " + player.Score);
     }
 
     #endregion
@@ -397,17 +447,18 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
                 NotificationParam successParam = new NotificationParam(successMessage, () => { UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false); });
                 EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, successParam);*/
 
+                PlayerData pData = new PlayerData(playerName, DEFAULT_SCORE);
+
                 //tạo đc tên thì bắn event cho chơi
-                EventsManager.Instance.Notify(EventID.OnCanPlay);
+                //kèm data người chơi này
+                EventsManager.Instance.Notify(EventID.OnCanPlay, pData);
 
-                //sau đó sẽ tuỳ vào client/host mà gửi data vừa tạo để add vào listPlayer phía Host
-                _playerData = new PlayerData(playerName, DEFAULT_SCORE);
-
+                //dựa vào là host hay client để gửi data và đánh index cho player
                 if (IsServer)
-                    _listPlayers.Add(_playerData);
+                    _listPlayers.Add(pData);
                 else if (IsClient && IsOwner)
                 {
-                    SendPlayerDataServerRpc(_playerData);
+                    SendPlayerDataServerRpc(pData, NetworkManager.Singleton.LocalClientId);
                     Debug.Log("client send data SvRpc");
                 }
                 _joinedLobby = updatedLobby;
