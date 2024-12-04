@@ -23,15 +23,18 @@ public class ButtonController : MonoBehaviour
                 break;
 
             case (int)ButtonIndex.Tutorial:
-
+                UIManager.Instance._mainMenuBtn.gameObject.SetActive(false);
+                UIManager.Instance.Tutorial.SetActive(true);
                 break;
 
             case (int)ButtonIndex.Settings:
-
+                UIManager.Instance._mainMenuBtn.gameObject.SetActive(false);
+                UIManager.Instance.Setting.SetActive(true);
                 break;
 
             case (int)ButtonIndex.About:
-
+                UIManager.Instance._mainMenuBtn.gameObject.SetActive(false);
+                UIManager.Instance.About.SetActive(true);
                 break;
         }
     }
