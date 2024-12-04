@@ -36,6 +36,7 @@ public class UIManager : BaseSingleton<UIManager>
     Dictionary<EPopupID, GameObject> _dictPopups = new Dictionary<EPopupID, GameObject>();
     Stack<GameObject> _stackPopupOrder = new Stack<GameObject>();
     Vector3 _initPos = Vector3.zero;
+    bool _canPlay;
 
     protected override void Awake()
     {
@@ -117,7 +118,8 @@ public class UIManager : BaseSingleton<UIManager>
             {
                 if (_dictPopups[EPopupID.PopupInformation].activeInHierarchy)
                     TogglePopup(EPopupID.PopupInformation, false);
-                TogglePopup(EPopupID.PopupEnterName, true);
+                if (!_canPlay)
+                    TogglePopup(EPopupID.PopupEnterName, true);
 
                 //for (int i = 0; i < _arrARComponents.Length; i++)
                     //_arrARComponents[i].gameObject.SetActive(true);
@@ -141,8 +143,8 @@ public class UIManager : BaseSingleton<UIManager>
             _arrARComponents[i].gameObject.SetActive(true);
 
         TogglePopup(EPopupID.PopupEnterName, false);
-        
-        Debug.Log("stack: " + _stackPopupOrder.Count);
+        _canPlay = true;
+        //Debug.Log("stack: " + _stackPopupOrder.Count);
         //if (_stackPopupOrder.Count > 0)
             //TogglePopup(EPopupID.PopupInformation, false);
     }

@@ -7085,8 +7085,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1926851777}
-  - component: {fileID: 1926851778}
   - component: {fileID: 1926851779}
+  - component: {fileID: 1926851778}
   m_Layer: 0
   m_Name: LobbyManager
   m_TagString: Untagged

@@ -18,6 +18,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     private PlayerData _playerData;
     float _heartBeatTimer;
     bool _isRelayConnected = false;
+    private NetworkList<PlayerData> _listPlayers;
 
     protected async override void Awake()
     {
@@ -27,12 +28,64 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
 
         AuthenticationService.Instance.SignedIn += () =>
         {
-            Debug.Log("Signed in " + AuthenticationService.Instance.PlayerId);
+            //Debug.Log("Signed in " + AuthenticationService.Instance.PlayerId);
         };
 
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
 
+        _listPlayers = new NetworkList<PlayerData>();
+        _listPlayers.OnListChanged += ListPlayersOnChanged;
         //RelayManager.Instance.CreateRelay();
+    }
+
+    #region Ownership
+    /// <summary>
+    /// Các đoạn mã này sẽ chuyển Ownership cho thằng client vừa kết nối
+    /// bởi vì mặc định IsOwner trên client sẽ = false do có thằng host (2 thằng share chung scr)
+    /// chuyển như này mới có thể sử dụng IsOwner và gọi Rpc được
+    /// </summary>
+    private void OnEnable()
+    {
+        NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
+    }
+
+    private void OnDisable()
+    {
+        NetworkManager.Singleton.OnClientConnectedCallback -= HandleClientConnected;
+    }
+
+    private void HandleClientConnected(ulong clientId)
+    {
+        if (IsServer)
+        {
+            //Khi client kết nối, thay đổi quyền sở hữu cho client đó
+            Debug.Log("new client has connected, change owner to: " + clientId);
+            GetComponent<NetworkObject>().ChangeOwnership(clientId);
+        }
+    }
+    #endregion
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+
+        if (IsClient)
+        {
+            Debug.Log("Client has joined.");
+        }
+    }
+
+    private void ListPlayersOnChanged(NetworkListEvent<PlayerData> changeEvent)
+    {
+        //chuyển đổi vì Netcode kh hỗ trợ serialization NetworkList
+        PlayerData[] tempArr = new PlayerData[_listPlayers.Count];
+        for(int i = 0; i < tempArr.Length; i++)
+            tempArr[i] = _listPlayers[i];
+
+        EventsManager.Instance.Notify(EventID.OnRefreshLeaderboard, tempArr);
+
+        RefreshLeaderboardClientRpc(tempArr);
+        Debug.Log("List changed");
     }
 
     private void Update()
@@ -145,12 +198,23 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         }
     }
 
+    #region RPC's Calls
+
     [ClientRpc]
-    private void UpdateListPlayerClientRpc()
+    private void RefreshLeaderboardClientRpc(PlayerData[] arrPlayers)
     {
-        if (IsClient)
-            Debug.Log("Tao duoc goi o client ne");
+        EventsManager.Instance.Notify(EventID.OnRefreshLeaderboard, arrPlayers);
     }
+
+    [ServerRpc]
+    private void SendPlayerDataServerRpc(PlayerData data)
+    {
+        //EventsManager.Instance.Notify(EventID.OnCanPlay, data);
+        _listPlayers.Add(data);
+        Debug.Log("add " +  data.Name);
+    }
+
+    #endregion
 
     private void OnLobbyChanged(ILobbyChanges changes)
     {
@@ -160,7 +224,6 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         }
         else
         {
-            UpdateListPlayerClientRpc();
             changes.ApplyToLobby(_joinedLobby);
             EventsManager.Instance.Notify(EventID.OnCheckGameplayState, _joinedLobby);
 
@@ -168,8 +231,8 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
             if (changes.PlayerJoined.Changed && !_isRelayConnected)
             {
                 _isRelayConnected = true;
-                RelayManager.Instance.JoinRelay(_joinedLobby.Data[KEY_RELAY_CODE].Value);
-                Debug.Log("Join Relay when lobby changes: ");
+                //RelayManager.Instance.JoinRelay(_joinedLobby.Data[KEY_RELAY_CODE].Value);
+                //Debug.Log("Join Relay when lobby changes: ");
             }
         }
     }
@@ -255,6 +318,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
 
             Lobby lobby = await Lobbies.Instance.JoinLobbyByIdAsync(lobbyID, options);//JoinLobbyByIDAsync(cleanedLobbyCode);
             _joinedLobby = lobby;
+            RelayManager.Instance.JoinRelay(_joinedLobby.Data[KEY_RELAY_CODE].Value);
 
             TweenSwitchScene();
         }
@@ -263,23 +327,6 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
             Debug.Log(ex);
         }
     }
-
-    /*private async void HandleLobbyPollForUpdates()
-    {
-        if (_joinedLobby != null)
-        {
-            _lobbyUpdateTimer -= Time.deltaTime;
-            if (_lobbyUpdateTimer <= 0f)
-            {
-                float lobbyUpdateTimerMax = 1.5f;
-                _lobbyUpdateTimer = lobbyUpdateTimerMax;
-
-                Lobby lobby = await LobbyService.Instance.GetLobbyAsync(_joinedLobby.Id);
-                _joinedLobby = lobby;
-                EventsManager.Instance.Notify(EventID.OnCheckGameplayState, _joinedLobby);
-            }
-        }
-    }*/
 
     public void RefreshLobbies()
     {
@@ -350,12 +397,23 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
                 NotificationParam successParam = new NotificationParam(successMessage, () => { UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false); });
                 EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, successParam);*/
 
+                //tạo đc tên thì bắn event cho chơi
+                EventsManager.Instance.Notify(EventID.OnCanPlay);
+
+                //sau đó sẽ tuỳ vào client/host mà gửi data vừa tạo để add vào listPlayer phía Host
                 _playerData = new PlayerData(playerName, DEFAULT_SCORE);
-                EventsManager.Instance.Notify(EventID.OnCanPlay, _playerData);
+
+                if (IsServer)
+                    _listPlayers.Add(_playerData);
+                else if (IsClient && IsOwner)
+                {
+                    SendPlayerDataServerRpc(_playerData);
+                    Debug.Log("client send data SvRpc");
+                }
                 _joinedLobby = updatedLobby;
 
-                foreach (var p in _joinedLobby.Players)
-                    Debug.Log("Lobby " + _joinedLobby.Name + ", Player: " + p.Data[KEY_PLAYER_NAME].Value);
+                //foreach (var p in _joinedLobby.Players)
+                    //Debug.Log("Lobby " + _joinedLobby.Name + ", Player: " + p.Data[KEY_PLAYER_NAME].Value);
             }
         }
         catch (LobbyServiceException ex)

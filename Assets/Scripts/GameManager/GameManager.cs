@@ -7,45 +7,22 @@ using UnityEngine;
 using static GameEnums;
 using static GameConst;
 
-[Serializable]
-public struct PlayerData : INetworkSerializable, IEquatable<PlayerData>
-{
-    public FixedString32Bytes Name;
-    public int Score;
-
-    public PlayerData(FixedString32Bytes name, int score)
-    {
-        Name = name;
-        Score = score;
-    }
-    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
-    {
-        serializer.SerializeValue(ref Name);
-        serializer.SerializeValue(ref Score);
-    }
-    public bool Equals(PlayerData other)
-    {
-        return Name == other.Name &&
-               Score == other.Score;
-    }
-}
-
 public class GameManager : NetworkSingleton<GameManager>
 {
     [SerializeField] int _targetFrameRate;
-    private NetworkList<PlayerData> _listPlayers;
+    //private NetworkList<PlayerData> _listPlayers;
     
 
     protected override void Awake()
     {
         base.Awake();
         Application.targetFrameRate = _targetFrameRate;
-        EventsManager.Instance.Subscribe(EventID.OnCanPlay, CreateListPlayers);
-        _listPlayers = new NetworkList<PlayerData>();
-        _listPlayers.OnListChanged += OnListPlayersChanged;
+        //EventsManager.Instance.Subscribe(EventID.OnCanPlay, CreateListPlayers);
+        //_listPlayers = new NetworkList<PlayerData>();
+        //_listPlayers.OnListChanged += OnListPlayersChanged; 
     }
 
-    private void CreateListPlayers(object obj)
+    /*private void CreateListPlayers(object obj)
     {
         if (obj != null)
         {
@@ -65,17 +42,17 @@ public class GameManager : NetworkSingleton<GameManager>
             else
                 foreach (var player in _listPlayers)
                     Debug.Log("Client saw player: " + player.Name);
-    }
+    }*/
 
     public override void OnDestroy()
     {
         base.OnDestroy();
-        EventsManager.Instance.Unsubscribe(EventID.OnCanPlay, CreateListPlayers);
-        _listPlayers.OnListChanged -= OnListPlayersChanged;
+        //EventsManager.Instance.Unsubscribe(EventID.OnCanPlay, CreateListPlayers);
+        //_listPlayers.OnListChanged -= OnListPlayersChanged;
     }
 
     private void OnListPlayersChanged(NetworkListEvent<PlayerData> changeEvent)
     {
-        EventsManager.Instance.Notify(EventID.OnRefreshLeaderboard, _listPlayers);
+        //EventsManager.Instance.Notify(EventID.OnRefreshLeaderboard, _listPlayers);
     }
 }

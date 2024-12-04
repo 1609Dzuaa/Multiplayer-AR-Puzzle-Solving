@@ -27,12 +27,12 @@ public class LeaderboardController : PopupController
 
     private void RefreshLeaderboard(object obj)
     {
-        NetworkList<PlayerData> listPlayers = (NetworkList<PlayerData>)obj;
+        PlayerData[] arrPlayers = (PlayerData[])obj;
         foreach (Transform t in _content)
             Destroy(t.gameObject);
 
         List<PlayerData> tempList = new List<PlayerData>();
-        foreach (var p in listPlayers)
+        foreach (var p in arrPlayers)
             tempList.Add(p);
 
         tempList = tempList.OrderByDescending(x => x.Score).ToList();

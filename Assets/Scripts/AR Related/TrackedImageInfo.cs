@@ -91,7 +91,7 @@ public class TrackedImageInfo : MonoBehaviour
             if (!quest) Debug.Log("Question of image: " + name + " get null");
             else EventsManager.Instance.Notify(EventID.OnReceiveQuestInfo, quest);
 
-            Debug.Log("active true: " + prefab);
+            //Debug.Log("active true: " + prefab);
 
             foreach (GameObject go in _dictSpawnPrefabs.Values)
             {
