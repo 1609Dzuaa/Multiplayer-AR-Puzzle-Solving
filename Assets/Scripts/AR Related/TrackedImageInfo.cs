@@ -30,7 +30,7 @@ public class TrackedImageInfo : MonoBehaviour
             newPrefab.name = prefab.name;
             _dictSpawnPrefabs.Add(prefab.name, newPrefab);
             newPrefab.SetActive(false);
-            Debug.Log("name: " + prefab.name);
+            //Debug.Log("name: " + prefab.name);
         }
     }
 
@@ -44,7 +44,7 @@ public class TrackedImageInfo : MonoBehaviour
         Question questInfo = obj as Question;
         Destroy(_dictSpawnPrefabs[questInfo.ImageName]);
         _dictSpawnPrefabs.Remove(questInfo.ImageName);
-        Debug.Log("remove: " +  questInfo.ImageName);
+        //Debug.Log("remove: " +  questInfo.ImageName);
     }
 
     private void OnEnable()
@@ -72,7 +72,7 @@ public class TrackedImageInfo : MonoBehaviour
         foreach (ARTrackedImage trackImage in eventArgs.removed)
         {
             _dictSpawnPrefabs[trackImage.name].SetActive(false);
-            Debug.Log("active false, image name: " + trackImage.name);
+            //Debug.Log("active false, image name: " + trackImage.name);
         }
     }
 
@@ -91,14 +91,14 @@ public class TrackedImageInfo : MonoBehaviour
             if (!quest) Debug.Log("Question of image: " + name + " get null");
             else EventsManager.Instance.Notify(EventID.OnReceiveQuestInfo, quest);
 
-            Debug.Log("active true: " + prefab);
+            //Debug.Log("active true: " + prefab);
 
             foreach (GameObject go in _dictSpawnPrefabs.Values)
             {
                 if (go.name != name && go.activeSelf)
                 {
                     go.SetActive(false);
-                    Debug.Log("active false, goName, name: " + go.name + ", " + name);
+                    //Debug.Log("active false, goName, name: " + go.name + ", " + name);
                 }
             }
         }

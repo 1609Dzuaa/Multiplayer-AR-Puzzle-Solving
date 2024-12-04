@@ -36,6 +36,7 @@ public class UIManager : BaseSingleton<UIManager>
     Dictionary<EPopupID, GameObject> _dictPopups = new Dictionary<EPopupID, GameObject>();
     Stack<GameObject> _stackPopupOrder = new Stack<GameObject>();
     Vector3 _initPos = Vector3.zero;
+    bool _canPlay;
 
     protected override void Awake()
     {
@@ -55,6 +56,7 @@ public class UIManager : BaseSingleton<UIManager>
         EventsManager.Instance.Subscribe(EventID.OnLogoTweenCompleted, TweenButtons);
         EventsManager.Instance.Subscribe(EventID.OnStartGame, StartGame);
         EventsManager.Instance.Subscribe(EventID.OnCheckGameplayState, CheckGameplayState);
+        EventsManager.Instance.Subscribe(EventID.OnCanPlay, AllowToPlay);
 
         for (int i = 0; i < _arrPopups.Length; i++)
         {
@@ -73,6 +75,7 @@ public class UIManager : BaseSingleton<UIManager>
         EventsManager.Instance.Unsubscribe(EventID.OnLogoTweenCompleted, TweenButtons);
         EventsManager.Instance.Unsubscribe(EventID.OnStartGame, StartGame);
         EventsManager.Instance.Unsubscribe(EventID.OnCheckGameplayState, CheckGameplayState);
+        EventsManager.Instance.Unsubscribe(EventID.OnCanPlay, AllowToPlay);
     }
 
     private void TweenButtons(object obj = null)
@@ -113,12 +116,17 @@ public class UIManager : BaseSingleton<UIManager>
         {
             if (lobbyJoined.Players.Count >= DEFAULT_TOTAL_PLAYER_TO_PLAY)
             {
-                for (int i = 0; i < _arrARComponents.Length; i++)
-                    _arrARComponents[i].gameObject.SetActive(true);
+                if (_dictPopups[EPopupID.PopupInformation].activeInHierarchy)
+                    TogglePopup(EPopupID.PopupInformation, false);
+                if (!_canPlay)
+                    TogglePopup(EPopupID.PopupEnterName, true);
+
+                //for (int i = 0; i < _arrARComponents.Length; i++)
+                    //_arrARComponents[i].gameObject.SetActive(true);
 
                 //Debug.Log("stack: " + _stackPopupOrder.Count);
-                if (_stackPopupOrder.Count > 0)
-                    TogglePopup(EPopupID.PopupInformation, false);
+                //if (_stackPopupOrder.Count > 0)
+                    //TogglePopup(EPopupID.PopupInformation, false);
             }
             else
             {
@@ -126,7 +134,19 @@ public class UIManager : BaseSingleton<UIManager>
             }
         }
 
-        Debug.Log("check state");
+        //Debug.Log("check state");
+    }
+
+    private void AllowToPlay(object obj)
+    {
+        for (int i = 0; i < _arrARComponents.Length; i++)
+            _arrARComponents[i].gameObject.SetActive(true);
+
+        TogglePopup(EPopupID.PopupEnterName, false);
+        _canPlay = true;
+        //Debug.Log("stack: " + _stackPopupOrder.Count);
+        //if (_stackPopupOrder.Count > 0)
+            //TogglePopup(EPopupID.PopupInformation, false);
     }
 
     private void PopupLockGameplay(Lobby lobby)
@@ -153,13 +173,13 @@ public class UIManager : BaseSingleton<UIManager>
         else
         {
             _dictPopups[id].gameObject.GetComponent<PopupController>().TweenPopupOff(() => _dictPopups[id].SetActive(false));
-            _stackPopupOrder.Pop();
+            _stackPopupOrder.Pop(); //bug client o day
 
             //if (_stackPopupOrder.Count > 0)
                 //_stackPopupOrder.Peek().SetActive(true);
         }
 
-        Debug.Log("id: " + id);
+        //Debug.Log("id: " + id);
         _dimmedBG.gameObject.SetActive((_stackPopupOrder.Count > 0) ? true : On);
     }
 
