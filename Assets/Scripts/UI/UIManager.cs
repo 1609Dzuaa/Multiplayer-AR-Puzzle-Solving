@@ -18,7 +18,10 @@ public struct PopupStruct
 
 public class UIManager : BaseSingleton<UIManager>
 {
-    [SerializeField] MainMenuButton _mainMenuBtn;
+    public MainMenuButton _mainMenuBtn;
+    public GameObject Tutorial;
+    public GameObject Setting;
+    public GameObject About;
     [SerializeField] Transform _mainMenuUI;
     [SerializeField] Transform _sceneTrans;
     [SerializeField] Transform _dimmedBG;
@@ -45,6 +48,9 @@ public class UIManager : BaseSingleton<UIManager>
         for (int i = 0; i < _arrARComponents.Length; i++)
             _arrARComponents[i].gameObject.SetActive(false);
         _initPos = _sceneTrans.localPosition;
+        UIManager.Instance.Tutorial.SetActive(false);
+        UIManager.Instance.Setting.SetActive(false);
+        UIManager.Instance.About.SetActive(false);
         /*EventsManager.Instance.Subscribe(EventID.OnLogoTweenCompleted, TweenButtons);
         EventsManager.Instance.Subscribe(EventID.OnStartGame, StartGame);
         EventsManager.Instance.Subscribe(EventID.OnCheckGameplayState, CheckGameplayState);*/
