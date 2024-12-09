@@ -11,4 +11,6 @@ public static class GameConst
     public const string KEY_RELAY_CODE = "RelayCode";
     public const string KEY_PLAYER_NAME = "PlayerName";
     public const int DEFAULT_SCORE = 0;
+    public const int INDEX_CURRENT_QUEST = 0;
+    public const int INDEX_OF_HOST = 0;
 }

@@ -1,13 +1,15 @@
-﻿using System.Runtime.CompilerServices;
+﻿using Unity.Netcode;
 using UnityEngine;
 using static GameEnums;
 
-public class ChestInteraction : MonoBehaviour
+public class ChestInteraction : NetworkBehaviour
 {
     [SerializeField] Transform _parent;
     [SerializeField] ParticleSystem _psConfetti;
     [SerializeField] ParticleSystem _psSparkle;
     [SerializeField] Transform _confettiPosition;
+    //NetworkList<ulong> _listFastestPlayers; //store id của 3 thằng nhanh nhất
+
 
     private Animator _anim;
     Question _questInfo;
@@ -19,6 +21,7 @@ public class ChestInteraction : MonoBehaviour
     private void Awake()
     {
         EventsManager.Instance.Subscribe(EventID.OnReceiveQuestInfo, ReceiveQuestInfo);
+        //_listFastestPlayers = new NetworkList<ulong>();
     }
 
     void Start()
@@ -27,11 +30,11 @@ public class ChestInteraction : MonoBehaviour
         _psSparkle.Play();
     }
 
-    private void OnDestroy()
+    public override void OnDestroy()
     {
+        base.OnDestroy();
         EventsManager.Instance.Unsubscribe(EventID.OnReceiveQuestInfo, ReceiveQuestInfo);
     }
-
     private void ReceiveQuestInfo(object obj)
     {
         _questInfo = (Question)obj;
@@ -91,8 +94,8 @@ public class ChestInteraction : MonoBehaviour
     public void PopupReward()
     {
         //gửi thông tin của quest ở đây
-        //audio của 1 trong 3 thằng đang bị disable đầu game
-        QuestManager.Instance.RemoveQuest(_questInfo);
+        //track thành công thì bắn thông tin đi;
+        QuestManager.Instance.RemoveQuest();
         EventsManager.Instance.Notify(EventID.OnTrackedImageSuccess, _questInfo);
         UIManager.Instance.TogglePopup(EPopupID.PopupReward, true);
         //QuestManager.Instance.RemoveQuest(_questInfo);

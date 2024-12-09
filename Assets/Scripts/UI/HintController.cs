@@ -18,7 +18,7 @@ public class HintController : PopupController
     private void Start()
     {
         EventsManager.Instance.Subscribe(EventID.OnTrackedImageSuccess, GetNextQuest);
-        _currentQuest = QuestManager.Instance.GetRandomQuest();
+        _currentQuest = QuestManager.Instance.GetNextQuest();
         _txtHint.text = (_currentQuest != null) ? _currentQuest.Hint : "No Hint Left";
     }
 
@@ -30,7 +30,7 @@ public class HintController : PopupController
     private void GetNextQuest(object obj = null)
     {
         Question questRemove = obj as Question;
-        _currentQuest = QuestManager.Instance.GetRandomQuest((questRemove != null) ? questRemove : _currentQuest);
+        _currentQuest = QuestManager.Instance.GetNextQuest();
         _txtHint.text = (_currentQuest != null) ? _currentQuest.Hint : "No Hint Left";
     }
 
