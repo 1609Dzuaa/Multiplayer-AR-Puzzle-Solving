@@ -18,13 +18,7 @@ public class TrackedImageInfo : MonoBehaviour
         _trackedImageManager = GetComponent<ARTrackedImageManager>();
         EventsManager.Instance.Subscribe(EventID.OnTrackedImageSuccess, RemovePrefab);
 
-        //mảng các obj sẽ spawn ra
-        //trong script chest sẽ có SO của quest, dictionary bên này đổi khoá thành 
-        //for _arrChest[i].SO = QuestM.ListQuest[i];
-        //_dict.Add(_arrChest[i].SO.ID, _arrChest[i])
-        //
-
-        foreach(var prefab in _placeablePrefabs)
+        foreach (var prefab in _placeablePrefabs)
         {
             GameObject newPrefab = Instantiate(prefab, Vector3.zero, Quaternion.identity);
             newPrefab.name = prefab.name;

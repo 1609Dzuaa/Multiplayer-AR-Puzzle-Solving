@@ -17,7 +17,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     Lobby _hostLobby, _joinedLobby;
     //public PlayerData PlayerData;
     float _heartBeatTimer;
-    bool _isRelayConnected = false;
+    bool _isRelayConnected = false, _startCount = false;
     NetworkList<PlayerData> _listPlayers;
     int _playerIndex = 0;
 
@@ -283,6 +283,12 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
                 _isRelayConnected = true;
                 //RelayManager.Instance.JoinRelay(_joinedLobby.Data[KEY_RELAY_CODE].Value);
                 //Debug.Log("Join Relay when lobby changes: ");
+            }
+
+            if (IsServer && !_startCount && _joinedLobby.Players.Count >= 2)
+            {
+                _startCount = true;
+                RoundManager.Instance.StartRoundServerRpc();
             }
         }
     }
