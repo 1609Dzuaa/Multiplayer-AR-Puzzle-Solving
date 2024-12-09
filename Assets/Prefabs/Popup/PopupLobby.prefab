@@ -645,8 +645,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: lobby
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: eaa8615fe26a04e49a30d6f37a6b4954, type: 2}
-  m_sharedMaterial: {fileID: -4001293270552118757, guid: eaa8615fe26a04e49a30d6f37a6b4954,
+  m_fontAsset: {fileID: 11400000, guid: 9536bc17ec4418e42ae8d65a2f0e47e2, type: 2}
+  m_sharedMaterial: {fileID: -208557581752504688, guid: 9536bc17ec4418e42ae8d65a2f0e47e2,
     type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}

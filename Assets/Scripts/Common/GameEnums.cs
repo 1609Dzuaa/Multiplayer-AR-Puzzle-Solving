@@ -29,7 +29,8 @@ public static class GameEnums
         PopupReward = 5,
         PopupLobby = 6,
         PopupConfigRoom = 7,
-        PopupEnterName = 8,
+        PopupShop = 8,
+        PopupEnterName = 9,
 
     }
 
