@@ -42,9 +42,4 @@ public class ScoreController : MonoBehaviour
     {
         _pData = (PlayerData)obj;
     }
-
-    /*private void Update()
-    {
-        _txtScore.text = (1.0f / Time.deltaTime).ToString();
-    }*/
 }

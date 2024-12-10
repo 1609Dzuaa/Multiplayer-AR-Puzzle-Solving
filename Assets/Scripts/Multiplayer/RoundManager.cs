@@ -4,55 +4,66 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.Netcode;
 using UnityEngine;
+using static GameEnums;
 
 public class RoundManager : NetworkSingleton<RoundManager>
 {
-    [SerializeField] TextMeshProUGUI _txtTimer;
-    [SerializeField] float _delayCountdown;
+    [SerializeField] TextMeshProUGUI _txtTimer, _txtRound;
+    [HideInInspector] public NetworkVariable<int> CountRound = new NetworkVariable<int>();
+    [HideInInspector] public NetworkVariable<int> NumOfRounds = new NetworkVariable<int>();
     [HideInInspector] public NetworkVariable<int> RoundTimer = new NetworkVariable<int>();
-    [HideInInspector] public NetworkVariable<int> Count = new NetworkVariable<int>();
+    [HideInInspector] public NetworkVariable<int> PrepTimer = new NetworkVariable<int>();
+    [HideInInspector] public NetworkVariable<int> CountTime = new NetworkVariable<int>();
+    NetworkVariable<int> _round = new NetworkVariable<int>(1);
     NetworkVariable<float> _entryTime = new NetworkVariable<float>();
     private Coroutine countdownCoroutine;
 
     private void OnEnable()
     {
-        Count.OnValueChanged += OnCountChanged;
+        CountTime.OnValueChanged += OnCountTimeChanged;
+        CountRound.OnValueChanged += OnCountRoundChanged;
     }
 
     private void OnDisable()
     {
-        Count.OnValueChanged -= OnCountChanged;
+        CountTime.OnValueChanged -= OnCountTimeChanged;
+        CountRound.OnValueChanged -= OnCountRoundChanged;
     }
 
-    private void OnCountChanged(int previousValue, int newValue)
+    private string FormatTime(int totalSeconds)
     {
-        _txtTimer.text = newValue.ToString();
+        int minutes = totalSeconds / 60;
+        int seconds = totalSeconds % 60;
+        return $"{minutes}:{seconds:D2}";
+    }
+
+    private void OnCountRoundChanged(int previousValue, int newValue)
+    {
+        _txtRound.text = "Round " + newValue.ToString() + "/" + NumOfRounds.Value.ToString();
+    }
+
+    private void OnCountTimeChanged(int previousValue, int newValue)
+    {
+        _txtTimer.text = FormatTime(newValue);
     }
 
     [ServerRpc]
     public void StartRoundServerRpc()
     {
-        Count.OnValueChanged += OnCountChanged;
-        StartCoroutine(DelayStartCount());
+        CountTime.OnValueChanged += OnCountTimeChanged;
+        CountRound.OnValueChanged += OnCountRoundChanged;
+        StartCount();
     }
 
-    [ClientRpc]
-    public void NotifyCountdownStartClientRpc()
+    private void StartCount()
     {
-        Debug.Log("Countdown started on client.");
-        _txtTimer.text = Count.Value.ToString();
-    }
-
-    private IEnumerator DelayStartCount()
-    {
-        yield return new WaitForSeconds(_delayCountdown);
-
         _entryTime.Value = Time.time;
-        Count.Value = 120;
-
+        CountRound.Value = 1;
+        CountTime.Value = RoundTimer.Value;
         Debug.Log("Client started timer");
 
-        _txtTimer.text = Count.Value.ToString();
+        _txtRound.text = "Round " + 1.ToString() + "/" + NumOfRounds.Value.ToString();
+        _txtTimer.text = FormatTime(CountTime.Value);
         StartCountdown();
     }
 
@@ -64,14 +75,21 @@ public class RoundManager : NetworkSingleton<RoundManager>
 
     private IEnumerator CountdownCoroutine()
     {
-        while (Count.Value > 0)
+        while (CountRound.Value <= NumOfRounds.Value)
         {
-            yield return new WaitForSeconds(1f);
-            Count.Value -= 1;
-            _txtTimer.text = Count.Value.ToString();
-            //NotifyCountdownStartClientRpc();
+            while (CountTime.Value > 0)
+            {
+                yield return new WaitForSeconds(1f);
+                CountTime.Value -= 1;
+                _txtTimer.text = FormatTime(CountTime.Value);
+                //NotifyCountdownStartClientRpc();
+            }
+
+            CountRound.Value++;
+            CountTime.Value = RoundTimer.Value;
+            //Debug.Log("Finish a round: " + CountRound.Value + "/" + CountTime.Value);
         }
 
-        Debug.Log("Countdown finished!");
+        //Debug.Log("Finish game");
     }
 }

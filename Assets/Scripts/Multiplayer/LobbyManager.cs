@@ -5,7 +5,6 @@ using TMPro;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
-using Unity.Services.Core.Environments;
 using Unity.Services.Lobbies;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
@@ -19,6 +18,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     float _heartBeatTimer;
     bool _isRelayConnected = false, _startCount = false;
     NetworkList<PlayerData> _listPlayers;
+    PlayerData _pData;
     int _playerIndex = 0;
 
     #region Init & Destroy
@@ -111,9 +111,9 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     private void Update()
     {
         HandleLobbyHeartBeat();
-        if (_listPlayers != null)
+        /*if (_listPlayers != null)
             foreach (var p in _listPlayers)
-                Debug.Log("name, scr: " + p.Name + ", " + p.Score);
+                Debug.Log("name, scr: " + p.Name + ", " + p.Score);*/
         //HandleLobbyPollForUpdates();
     }
 
@@ -134,7 +134,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
 
     #endregion
 
-    private async void CreateLobby(string lobbyName, int maxPlayers)
+    private async void CreateLobby(string lobbyName, int maxPlayers, int numOfRounds, int timeLimit, int timePrep)
     {
         if (String.IsNullOrEmpty(lobbyName))
         {
@@ -177,6 +177,9 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
                 _hostLobby = lobby;
                 _joinedLobby = _hostLobby;
                 _playerIndex = INDEX_OF_HOST;
+                RoundManager.Instance.NumOfRounds.Value = numOfRounds;
+                RoundManager.Instance.RoundTimer.Value = timeLimit;
+                RoundManager.Instance.PrepTimer.Value = timePrep;
 
                 try
                 {
@@ -240,6 +243,12 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         UpdatePlayerIndexClientRpc(_listPlayers.Count, clientId);
         _listPlayers.Add(data);
         Debug.Log("add " +  data.Name);
+        if (_listPlayers.Count == DEFAULT_TOTAL_PLAYER_TO_PLAY && !_startCount)
+        {
+            _startCount = true;
+            AllowToPlayClientRpc();
+            RoundManager.Instance.StartRoundServerRpc();
+        }
     }
 
     [ClientRpc]
@@ -247,6 +256,12 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     {
         if (NetworkManager.Singleton.LocalClientId == clientId)
             _playerIndex = playerIndex;
+    }
+
+    [ClientRpc]
+    private void AllowToPlayClientRpc()
+    {
+        EventsManager.Instance.Notify(EventID.OnCanPlay, _pData);
     }
 
     [ServerRpc]
@@ -275,21 +290,16 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         else
         {
             changes.ApplyToLobby(_joinedLobby);
-            EventsManager.Instance.Notify(EventID.OnCheckGameplayState, _joinedLobby);
 
             //có thằng join
             if (changes.PlayerJoined.Changed && !_isRelayConnected)
             {
                 _isRelayConnected = true;
+                EventsManager.Instance.Notify(EventID.OnCheckGameplayState, _joinedLobby);
                 //RelayManager.Instance.JoinRelay(_joinedLobby.Data[KEY_RELAY_CODE].Value);
                 //Debug.Log("Join Relay when lobby changes: ");
             }
-
-            if (IsServer && !_startCount && _joinedLobby.Players.Count >= 2)
-            {
-                _startCount = true;
-                RoundManager.Instance.StartRoundServerRpc();
-            }
+            Debug.Log("Lobby changed");
         }
     }
 
@@ -306,9 +316,9 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         EventsManager.Instance.Notify(EventID.OnStartGame, _joinedLobby);
     }
 
-    public void CreateALobby(string lobbyName, int maxPlayers)
+    public void CreateALobby(string lobbyName, int maxPlayers, int numOfRounds, int timeLimit, int timePrep)
     {
-        CreateLobby(lobbyName, maxPlayers);
+        CreateLobby(lobbyName, maxPlayers, numOfRounds, timeLimit, timePrep);
     }
 
     public void ListLobby()
@@ -453,18 +463,23 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
                 NotificationParam successParam = new NotificationParam(successMessage, () => { UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false); });
                 EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, successParam);*/
 
-                PlayerData pData = new PlayerData(playerName, DEFAULT_SCORE);
+                _pData = new PlayerData(playerName, DEFAULT_SCORE);
 
                 //tạo đc tên thì bắn event cho chơi
                 //kèm data người chơi này
-                EventsManager.Instance.Notify(EventID.OnCanPlay, pData);
+                //EventsManager.Instance.Notify(EventID.OnCanPlay, pData);
+                UIManager.Instance.TogglePopup(EPopupID.PopupEnterName, false);
+                string content = "Waiting for other players...";
+                NotificationParam param = new NotificationParam(content);
+                UIManager.Instance.TogglePopup(EPopupID.PopupInformation, true);
+                EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
 
                 //dựa vào là host hay client để gửi data và đánh index cho player
                 if (IsServer)
-                    _listPlayers.Add(pData);
+                    _listPlayers.Add(_pData);
                 else if (IsClient && IsOwner)
                 {
-                    SendPlayerDataServerRpc(pData, NetworkManager.Singleton.LocalClientId);
+                    SendPlayerDataServerRpc(_pData, NetworkManager.Singleton.LocalClientId);
                     Debug.Log("client send data SvRpc");
                 }
                 _joinedLobby = updatedLobby;

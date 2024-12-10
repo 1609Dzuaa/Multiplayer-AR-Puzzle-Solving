@@ -148,7 +148,7 @@ public class UIManager : BaseSingleton<UIManager>
         for (int i = 0; i < _arrARComponents.Length; i++)
             _arrARComponents[i].gameObject.SetActive(true);
 
-        TogglePopup(EPopupID.PopupEnterName, false);
+        TogglePopup(EPopupID.PopupInformation, false);
         _canPlay = true;
         //Debug.Log("stack: " + _stackPopupOrder.Count);
         //if (_stackPopupOrder.Count > 0)
