@@ -7,9 +7,9 @@ public class QuestManager : BaseSingleton<QuestManager>
 {
     public List<Question> ListQuest;
 
-    public Question GetNextQuest()
+    public Question GetNextQuest(int questIndex)
     {
-        return ListQuest[INDEX_CURRENT_QUEST];
+        return ListQuest[questIndex];
     }
 
     public void RemoveQuest()

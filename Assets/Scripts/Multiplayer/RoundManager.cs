@@ -47,6 +47,8 @@ public class RoundManager : NetworkSingleton<RoundManager>
         _txtTimer.text = FormatTime(newValue);
     }
 
+    #region RPCs
+
     [ServerRpc]
     public void StartRoundServerRpc()
     {
@@ -54,6 +56,14 @@ public class RoundManager : NetworkSingleton<RoundManager>
         CountRound.OnValueChanged += OnCountRoundChanged;
         StartCount();
     }
+
+    [ClientRpc]
+    private void GiveHintClientRpc()
+    {
+        EventsManager.Instance.Notify(EventID.OnReceiveQuest, CountRound);
+    }
+
+    #endregion
 
     private void StartCount()
     {
@@ -65,6 +75,7 @@ public class RoundManager : NetworkSingleton<RoundManager>
         _txtRound.text = "Round " + 1.ToString() + "/" + NumOfRounds.Value.ToString();
         _txtTimer.text = FormatTime(CountTime.Value);
         StartCountdown();
+        GiveHintClientRpc();
     }
 
     public void StartCountdown()
@@ -82,11 +93,11 @@ public class RoundManager : NetworkSingleton<RoundManager>
                 yield return new WaitForSeconds(1f);
                 CountTime.Value -= 1;
                 _txtTimer.text = FormatTime(CountTime.Value);
-                //NotifyCountdownStartClientRpc();
             }
 
             CountRound.Value++;
             CountTime.Value = RoundTimer.Value;
+            GiveHintClientRpc();
             //Debug.Log("Finish a round: " + CountRound.Value + "/" + CountTime.Value);
         }
 

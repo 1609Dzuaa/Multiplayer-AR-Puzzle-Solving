@@ -141,18 +141,21 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
             string content = "Lobby Name Is Empty";
             NotificationParam param = new NotificationParam(content);
             EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
+            UIManager.Instance.TogglePopup(EPopupID.PopupInformation, true);
         }
         else if (maxPlayers < DEFAULT_TOTAL_PLAYER_TO_PLAY)
         {
             string content = "Cannot create a room under 3 players!";
             NotificationParam param = new NotificationParam(content);
             EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
+            UIManager.Instance.TogglePopup(EPopupID.PopupInformation, true);
         }
         else if (maxPlayers > DEFAULT_MAX_PLAYER)
         {
             string content = "Cannot create a room over 5 players!";
             NotificationParam param = new NotificationParam(content);
             EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
+            UIManager.Instance.TogglePopup(EPopupID.PopupInformation, true);
         }
         else
         {

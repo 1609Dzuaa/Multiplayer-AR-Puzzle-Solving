@@ -4,6 +4,7 @@ using UnityEngine;
 using DG.Tweening;
 using TMPro;
 using static GameEnums;
+using Unity.Netcode;
 
 public class HintController : PopupController
 {
@@ -15,22 +16,25 @@ public class HintController : PopupController
     protected const int BUTTON_RIGHT_CLICK = 1;
     Question _currentQuest;
 
-    private void Start()
+    private void Awake()
     {
-        EventsManager.Instance.Subscribe(EventID.OnTrackedImageSuccess, GetNextQuest);
-        _currentQuest = QuestManager.Instance.GetNextQuest();
-        _txtHint.text = (_currentQuest != null) ? _currentQuest.Hint : "No Hint Left";
+        EventsManager.Instance.Subscribe(EventID.OnReceiveQuest, GetNextQuest);
+        //EventsManager.Instance.Subscribe(EventID.OnTrackedImageSuccess, GetNextQuest);
+        //_currentQuest = QuestManager.Instance.GetNextQuest();
+        //_txtHint.text = (_currentQuest != null) ? _currentQuest.Hint : "No Hint Left";
     }
 
     private void OnDestroy()
     {
-        EventsManager.Instance.Unsubscribe(EventID.OnTrackedImageSuccess, GetNextQuest);
+        EventsManager.Instance.Unsubscribe(EventID.OnReceiveQuest, GetNextQuest);
+        //EventsManager.Instance.Unsubscribe(EventID.OnTrackedImageSuccess, GetNextQuest);
     }
 
     private void GetNextQuest(object obj = null)
     {
-        Question questRemove = obj as Question;
-        _currentQuest = QuestManager.Instance.GetNextQuest();
+        //Question questRemove = obj as Question;
+        NetworkVariable<int> currentRound = (NetworkVariable<int>)obj;
+        _currentQuest = QuestManager.Instance.GetNextQuest(currentRound.Value);
         _txtHint.text = (_currentQuest != null) ? _currentQuest.Hint : "No Hint Left";
     }
 
