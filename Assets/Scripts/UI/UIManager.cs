@@ -45,8 +45,8 @@ public class UIManager : BaseSingleton<UIManager>
     {
         base.Awake();
         DontDestroyOnLoad(gameObject);
-        for (int i = 0; i < _arrARComponents.Length; i++)
-            _arrARComponents[i].gameObject.SetActive(false);
+        /*for (int i = 0; i < _arrARComponents.Length; i++)
+            _arrARComponents[i].gameObject.SetActive(false);*/
         _initPos = _sceneTrans.localPosition;
         UIManager.Instance.Tutorial.SetActive(false);
         UIManager.Instance.Setting.SetActive(false);
@@ -63,6 +63,9 @@ public class UIManager : BaseSingleton<UIManager>
         EventsManager.Instance.Subscribe(EventID.OnStartGame, StartGame);
         EventsManager.Instance.Subscribe(EventID.OnCheckGameplayState, CheckGameplayState);
         EventsManager.Instance.Subscribe(EventID.OnCanPlay, AllowToPlay);
+
+        for (int i = 0; i < _arrARComponents.Length; i++)
+            _arrARComponents[i].gameObject.SetActive(false);
 
         for (int i = 0; i < _arrPopups.Length; i++)
         {
@@ -108,7 +111,12 @@ public class UIManager : BaseSingleton<UIManager>
                 _sceneTrans.localPosition = _initPos;
                 //thằng nào cũng phải truyền cái lobby nó join vào để check
                 if (joinedLobby != null)
+                {
                     CheckGameplayState(joinedLobby);
+                    Debug.Log("Check trong Start");
+                }
+                else
+                    Debug.Log("Lobby null 0 check");
             });
         });
     }
@@ -123,16 +131,22 @@ public class UIManager : BaseSingleton<UIManager>
             if (lobbyJoined.Players.Count >= DEFAULT_TOTAL_PLAYER_TO_PLAY)
             {
                 if (_dictPopups[EPopupID.PopupInformation].activeInHierarchy)
+                {
+                    Debug.Log("in4 false");
                     TogglePopup(EPopupID.PopupInformation, false);
+                }
                 if (!_canPlay)
+                {
                     TogglePopup(EPopupID.PopupEnterName, true);
+                    Debug.Log("popup enter name");
+                }
 
                 //for (int i = 0; i < _arrARComponents.Length; i++)
-                    //_arrARComponents[i].gameObject.SetActive(true);
+                //_arrARComponents[i].gameObject.SetActive(true);
 
                 //Debug.Log("stack: " + _stackPopupOrder.Count);
                 //if (_stackPopupOrder.Count > 0)
-                    //TogglePopup(EPopupID.PopupInformation, false);
+                //TogglePopup(EPopupID.PopupInformation, false);
             }
             else
             {
@@ -191,7 +205,7 @@ public class UIManager : BaseSingleton<UIManager>
 
     public void HideAllCurrentPopups()
     {
-        for (int i = 0; i <= _stackPopupOrder.Count; i++)
+        for (int i = 0; i < _stackPopupOrder.Count; i++)
         {
             _stackPopupOrder.Pop().gameObject.SetActive(false);
         }

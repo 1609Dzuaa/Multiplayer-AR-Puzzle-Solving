@@ -139,23 +139,17 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         if (String.IsNullOrEmpty(lobbyName))
         {
             string content = "Lobby Name Is Empty";
-            NotificationParam param = new NotificationParam(content);
-            EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
-            UIManager.Instance.TogglePopup(EPopupID.PopupInformation, true);
+            ShowNotification.Show(content);
         }
         else if (maxPlayers < DEFAULT_TOTAL_PLAYER_TO_PLAY)
         {
             string content = "Cannot create a room under 3 players!";
-            NotificationParam param = new NotificationParam(content);
-            EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
-            UIManager.Instance.TogglePopup(EPopupID.PopupInformation, true);
+            ShowNotification.Show(content);
         }
         else if (maxPlayers > DEFAULT_MAX_PLAYER)
         {
             string content = "Cannot create a room over 5 players!";
-            NotificationParam param = new NotificationParam(content);
-            EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
-            UIManager.Instance.TogglePopup(EPopupID.PopupInformation, true);
+            ShowNotification.Show(content);
         }
         else
         {
@@ -238,7 +232,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         EventsManager.Instance.Notify(EventID.OnRefreshLeaderboard, arrPlayers);
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void SendPlayerDataServerRpc(PlayerData data, ulong clientId)
     {
         //EventsManager.Instance.Notify(EventID.OnCanPlay, data);
@@ -265,6 +259,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     private void AllowToPlayClientRpc()
     {
         EventsManager.Instance.Notify(EventID.OnCanPlay, _pData);
+        Debug.Log("Fire Can Play:" + _pData.Name);
     }
 
     [ServerRpc]
@@ -278,8 +273,8 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     {
         Debug.Log("player, index: " + data.Name + ", " + playerIndex);
         _listPlayers[playerIndex] = data;
-        foreach (var player in _listPlayers)
-            Debug.Log("name, score: " + player.Name + ", " + player.Score);
+        //foreach (var player in _listPlayers)
+            //Debug.Log("name, score: " + player.Name + ", " + player.Score);
     }
 
     #endregion
@@ -473,18 +468,21 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
                 //EventsManager.Instance.Notify(EventID.OnCanPlay, pData);
                 UIManager.Instance.TogglePopup(EPopupID.PopupEnterName, false);
                 string content = "Waiting for other players...";
-                NotificationParam param = new NotificationParam(content);
-                UIManager.Instance.TogglePopup(EPopupID.PopupInformation, true);
-                EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
+                ShowNotification.Show(content);
+
+                SendPlayerDataServerRpc(_pData, NetworkManager.Singleton.LocalClientId);
 
                 //dựa vào là host hay client để gửi data và đánh index cho player
-                if (IsServer)
-                    _listPlayers.Add(_pData);
+                /*if (IsHost) //problem with owner
+                {
+                    SendPlayerDataServerRpc(_pData, NetworkManager.Singleton.LocalClientId);
+                    Debug.Log("server send data SvRpc");
+                }
                 else if (IsClient && IsOwner)
                 {
                     SendPlayerDataServerRpc(_pData, NetworkManager.Singleton.LocalClientId);
                     Debug.Log("client send data SvRpc");
-                }
+                }*/
                 _joinedLobby = updatedLobby;
 
                 //foreach (var p in _joinedLobby.Players)

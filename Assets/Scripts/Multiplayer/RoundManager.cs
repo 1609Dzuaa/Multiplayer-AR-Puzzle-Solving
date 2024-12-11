@@ -5,6 +5,7 @@ using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 using static GameEnums;
+using static GameConst;
 
 public class RoundManager : NetworkSingleton<RoundManager>
 {
@@ -14,6 +15,8 @@ public class RoundManager : NetworkSingleton<RoundManager>
     [HideInInspector] public NetworkVariable<int> RoundTimer = new NetworkVariable<int>();
     [HideInInspector] public NetworkVariable<int> PrepTimer = new NetworkVariable<int>();
     [HideInInspector] public NetworkVariable<int> CountTime = new NetworkVariable<int>();
+
+    //NetworkVariable<int> _countRest
     NetworkVariable<int> _round = new NetworkVariable<int>(1);
     NetworkVariable<float> _entryTime = new NetworkVariable<float>();
     private Coroutine countdownCoroutine;
@@ -58,9 +61,16 @@ public class RoundManager : NetworkSingleton<RoundManager>
     }
 
     [ClientRpc]
-    private void GiveHintClientRpc()
+    private void GiveHintClientRpc(int currentRound = 1)
     {
-        EventsManager.Instance.Notify(EventID.OnReceiveQuest, CountRound);
+        EventsManager.Instance.Notify(EventID.OnReceiveQuest, currentRound);
+    }
+
+    [ClientRpc]
+    private void StartRestClientRpc()
+    {
+        string content = "End of round " + CountRound.Value +", head to the Shop and buy some Power-ups";
+        ShowNotification.Show(content, () => { });
     }
 
     #endregion
@@ -68,9 +78,9 @@ public class RoundManager : NetworkSingleton<RoundManager>
     private void StartCount()
     {
         _entryTime.Value = Time.time;
-        CountRound.Value = 1;
+        CountRound.Value = FIRST_ROUND;
         CountTime.Value = RoundTimer.Value;
-        Debug.Log("Client started timer");
+        //Debug.Log("Client started timer");
 
         _txtRound.text = "Round " + 1.ToString() + "/" + NumOfRounds.Value.ToString();
         _txtTimer.text = FormatTime(CountTime.Value);
@@ -95,9 +105,20 @@ public class RoundManager : NetworkSingleton<RoundManager>
                 _txtTimer.text = FormatTime(CountTime.Value);
             }
 
+            //rest round
+            StartRestClientRpc();
+            CountTime.Value = PrepTimer.Value;
+            _txtRound.text = "Rest Round";
+
+            while (CountTime.Value > 0)
+            {
+                yield return new WaitForSeconds(1);
+                CountTime.Value -= 1;
+            }
+
             CountRound.Value++;
             CountTime.Value = RoundTimer.Value;
-            GiveHintClientRpc();
+            GiveHintClientRpc(CountRound.Value);
             //Debug.Log("Finish a round: " + CountRound.Value + "/" + CountTime.Value);
         }
 

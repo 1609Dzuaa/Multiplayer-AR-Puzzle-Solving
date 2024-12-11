@@ -13,4 +13,5 @@ public static class GameConst
     public const int DEFAULT_SCORE = 0;
     public const int INDEX_CURRENT_QUEST = 0;
     public const int INDEX_OF_HOST = 0;
+    public const int FIRST_ROUND = 1;
 }

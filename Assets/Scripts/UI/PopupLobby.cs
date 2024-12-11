@@ -23,6 +23,7 @@ public class PopupLobby : PopupController
         switch (index)
         {
             case BUTTON_CREATE:
+                UIManager.Instance.TogglePopup(EPopupID.PopupLobby, false);
                 UIManager.Instance.TogglePopup(EPopupID.PopupConfigRoom, true);
                 break;
 

@@ -12,4 +12,5 @@ public class Question : ScriptableObject
     public string Hint;
     public string NextHint;
     public int Score;
+    [Range(1, 10)] public int Round; //quest này thuộc round bnhieu
 }

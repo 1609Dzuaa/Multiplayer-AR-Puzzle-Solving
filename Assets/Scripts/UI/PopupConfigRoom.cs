@@ -38,12 +38,12 @@ public class PopupConfigRoom : PopupController
 
                 int indexDropdown1 = _dropdownPrepTime.value;
                 string selectedOption1 = _dropdownPrepTime.options[indexDropdown1].text;
-                int timePrep = int.Parse(selectedOption.Substring(0, 2));
+                int timePrep = int.Parse(selectedOption1.Substring(0, 2));
 
                 int indexDropdown2 = _dropdownRound.value;
                 string selectedOption2 = _dropdownRound.options[indexDropdown2].text;
-                int numOfRounds = int.Parse(selectedOption.Substring(0, 1));
-                //Debug.Log("Val: " + val);
+                int numOfRounds = int.Parse(selectedOption2.Substring(0, 1));
+                Debug.Log("Val Rounds: " + numOfRounds);
 
                 LobbyManager.Instance.CreateALobby(inputName, maxPlayers, numOfRounds, timeLimit, timePrep);
                 break;

@@ -13,11 +13,12 @@ public class ScoreController : MonoBehaviour
     int _score = 0;
     PlayerData _pData;
 
-    private void Start()
+    private void Awake()
     {
         _txtScore = GetComponent<TextMeshProUGUI>();
         EventsManager.Instance.Subscribe(EventID.OnTrackedImageSuccess, AddScore);
         EventsManager.Instance.Subscribe(EventID.OnCanPlay, ReceivePlayerData);
+        Debug.Log("Score sub");
     }
 
     private void OnDestroy()
@@ -41,5 +42,6 @@ public class ScoreController : MonoBehaviour
     private void ReceivePlayerData(object obj)
     {
         _pData = (PlayerData)obj;
+        Debug.Log("Can Play: " + _pData.Name);
     }
 }
