@@ -21,14 +21,16 @@ public class RoundManager : NetworkSingleton<RoundManager>
     NetworkVariable<float> _entryTime = new NetworkVariable<float>();
     private Coroutine countdownCoroutine;
 
-    private void OnEnable()
+    protected override void Awake()
     {
+        base.Awake();
         CountTime.OnValueChanged += OnCountTimeChanged;
         CountRound.OnValueChanged += OnCountRoundChanged;
     }
 
-    private void OnDisable()
+    public override void OnDestroy()
     {
+        base.OnDestroy();
         CountTime.OnValueChanged -= OnCountTimeChanged;
         CountRound.OnValueChanged -= OnCountRoundChanged;
     }
@@ -69,6 +71,7 @@ public class RoundManager : NetworkSingleton<RoundManager>
     [ClientRpc]
     private void StartRestClientRpc()
     {
+        _txtRound.text = "Rest Round";
         string content = "End of round " + CountRound.Value +", head to the Shop and buy some Power-ups";
         ShowNotification.Show(content, () => { });
     }
@@ -108,7 +111,6 @@ public class RoundManager : NetworkSingleton<RoundManager>
             //rest round
             StartRestClientRpc();
             CountTime.Value = PrepTimer.Value;
-            _txtRound.text = "Rest Round";
 
             while (CountTime.Value > 0)
             {

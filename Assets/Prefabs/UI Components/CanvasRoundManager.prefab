@@ -139,12 +139,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _txtTimer: {fileID: 3146891283068050332}
   _txtRound: {fileID: 6608226174824109931}
-  _delayCountdown: 5
+  CountRound:
+    m_InternalValue: 0
+  NumOfRounds:
+    m_InternalValue: 0
   RoundTimer:
     m_InternalValue: 0
   PrepTimer:
     m_InternalValue: 0
-  Count:
+  CountTime:
     m_InternalValue: 0
 --- !u!1 &381557221783179445
 GameObject:
@@ -391,11 +394,11 @@ RectTransform:
   - {fileID: 8340140848118114890}
   m_Father: {fileID: 9017441978385691337}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMin: {x: 0.5, y: 1}
+  m_AnchorMax: {x: 0.5, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 1000, y: 450}
-  m_Pivot: {x: 0, y: 1}
+  m_SizeDelta: {x: 960, y: 440}
+  m_Pivot: {x: 0.5, y: 1}
 --- !u!222 &7080218804830190661
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -631,7 +634,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 800, y: 220}
+  m_SizeDelta: {x: 800, y: 200}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &3829109328468237100
 MonoBehaviour:
