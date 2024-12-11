@@ -10,9 +10,11 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 21ac6ffc261ee7c41830d35ac0e6d50d, type: 3}
-  m_Name: TheSV_Quest
+  m_Name: CapUIT_Quest
   m_EditorClassIdentifier: 
-  ImageName: Chest_Orange
-  Hint: The back of something you can't go to school without.
-  NextHint: A small rectangle object.
-  Score: 20
+  ImageName: Chest_Orange 1
+  Hint: The front of an big item that K16 was the first academic year honored to
+    receive.
+  NextHint: Use to pack many items in it.
+  Score: 30
+  Round: 4

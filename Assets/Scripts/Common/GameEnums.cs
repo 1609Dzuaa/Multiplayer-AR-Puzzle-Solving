@@ -16,6 +16,7 @@ public static class GameEnums
         OnCanPlay, //bắn sau khi đã đặt tên thành công
         OnRefreshLeaderboard,
         OnUpdatePlayerData, //gửi thông tin player để cập nhật bxh
+        OnReceiveQuest, //từ host gửi cho tất cả player quest mới
 
     }
 

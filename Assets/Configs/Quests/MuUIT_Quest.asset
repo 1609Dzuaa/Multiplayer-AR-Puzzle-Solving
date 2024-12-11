@@ -10,9 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 21ac6ffc261ee7c41830d35ac0e6d50d, type: 3}
-  m_Name: DayDeoSV_Quest
+  m_Name: MuUIT_Quest
   m_EditorClassIdentifier: 
-  ImageName: Chest_Orange 4
-  Hint: A long item worn around the neck with the name of the school written in Vietnamese.
-  NextHint: It goes along with the student card.
-  Score: 20
+  ImageName: Chest_Orange 2
+  Hint: The front of an item that K16 was the first academic year honored to receive.
+  NextHint: Use to protect an important part of your body.
+  Score: 40
+  Round: 3

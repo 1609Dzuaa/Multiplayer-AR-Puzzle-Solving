@@ -11,7 +11,7 @@ public class PopupConfigRoom : PopupController
 
     [SerializeField] TextMeshProUGUI _txtName;
     [SerializeField] TextMeshProUGUI _txtTotalPlayer;
-    [SerializeField] TMP_Dropdown _dropdown;
+    [SerializeField] TMP_Dropdown _dropdownRound, _dropdownTimeLimit, _dropdownPrepTime;
 
     public void OnClick(int index)
     {
@@ -32,11 +32,20 @@ public class PopupConfigRoom : PopupController
                 else
                     Debug.LogError("Invalid input: totalPlayer is not a valid number");
 
-                int indexDropdown = _dropdown.value;
-                string selectedOption = _dropdown.options[indexDropdown].text;
-                Debug.Log("Val: " + selectedOption);
+                int indexDropdown = _dropdownTimeLimit.value;
+                string selectedOption = _dropdownTimeLimit.options[indexDropdown].text;
+                int timeLimit = int.Parse(selectedOption.Substring(0, 2));
 
-                LobbyManager.Instance.CreateALobby(inputName, maxPlayers);
+                int indexDropdown1 = _dropdownPrepTime.value;
+                string selectedOption1 = _dropdownPrepTime.options[indexDropdown1].text;
+                int timePrep = int.Parse(selectedOption1.Substring(0, 2));
+
+                int indexDropdown2 = _dropdownRound.value;
+                string selectedOption2 = _dropdownRound.options[indexDropdown2].text;
+                int numOfRounds = int.Parse(selectedOption2.Substring(0, 1));
+                Debug.Log("Val Rounds: " + numOfRounds);
+
+                LobbyManager.Instance.CreateALobby(inputName, maxPlayers, numOfRounds, timeLimit, timePrep);
                 break;
 
             case 2:

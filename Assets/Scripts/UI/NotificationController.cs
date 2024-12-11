@@ -74,11 +74,11 @@ public class NotificationController : HintController
 
     protected override void ButtonLeftClick()
     {
-        
+        UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false);
     }
 
     protected override void ButtonRightClick()
     {
-        //UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false);
+        UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false);
     }
 }

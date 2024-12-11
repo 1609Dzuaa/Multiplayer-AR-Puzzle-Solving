@@ -4,6 +4,7 @@ using UnityEngine;
 using DG.Tweening;
 using TMPro;
 using static GameEnums;
+using Unity.Netcode;
 
 public class HintController : PopupController
 {
@@ -15,22 +16,26 @@ public class HintController : PopupController
     protected const int BUTTON_RIGHT_CLICK = 1;
     Question _currentQuest;
 
-    private void Start()
+    private void Awake()
     {
-        EventsManager.Instance.Subscribe(EventID.OnTrackedImageSuccess, GetNextQuest);
-        _currentQuest = QuestManager.Instance.GetNextQuest();
-        _txtHint.text = (_currentQuest != null) ? _currentQuest.Hint : "No Hint Left";
+        EventsManager.Instance.Subscribe(EventID.OnReceiveQuest, GetNextQuest);
+        //EventsManager.Instance.Subscribe(EventID.OnTrackedImageSuccess, GetNextQuest);
+        //_currentQuest = QuestManager.Instance.GetNextQuest();
+        //_txtHint.text = (_currentQuest != null) ? _currentQuest.Hint : "No Hint Left";
     }
 
     private void OnDestroy()
     {
-        EventsManager.Instance.Unsubscribe(EventID.OnTrackedImageSuccess, GetNextQuest);
+        EventsManager.Instance.Unsubscribe(EventID.OnReceiveQuest, GetNextQuest);
+        //EventsManager.Instance.Unsubscribe(EventID.OnTrackedImageSuccess, GetNextQuest);
     }
 
     private void GetNextQuest(object obj = null)
     {
-        Question questRemove = obj as Question;
-        _currentQuest = QuestManager.Instance.GetNextQuest();
+        //Question questRemove = obj as Question;
+        int currentRound = (int)obj;
+        Debug.Log("Current Round: " + currentRound);
+        _currentQuest = QuestManager.Instance.GetNextQuest(currentRound - 1);
         _txtHint.text = (_currentQuest != null) ? _currentQuest.Hint : "No Hint Left";
     }
 
@@ -57,7 +62,12 @@ public class HintController : PopupController
 
     public void OnClick(int index)
     {
-        if (index == BUTTON_LEFT_CLICK)
+        if (index == -1)
+        {
+            Debug.Log("Onclick -1");
+            UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false);
+        }
+        else if (index == BUTTON_LEFT_CLICK)
             ButtonLeftClick();
         else
             ButtonRightClick();
