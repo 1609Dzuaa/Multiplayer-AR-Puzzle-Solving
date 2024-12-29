@@ -10,22 +10,24 @@ using static GameConst;
 public class RoundManager : NetworkSingleton<RoundManager>
 {
     [SerializeField] TextMeshProUGUI _txtTimer, _txtRound;
+    [SerializeField] float _delay;
+
     [HideInInspector] public NetworkVariable<int> CountRound = new NetworkVariable<int>();
     [HideInInspector] public NetworkVariable<int> NumOfRounds = new NetworkVariable<int>();
     [HideInInspector] public NetworkVariable<int> RoundTimer = new NetworkVariable<int>();
     [HideInInspector] public NetworkVariable<int> PrepTimer = new NetworkVariable<int>();
     [HideInInspector] public NetworkVariable<int> CountTime = new NetworkVariable<int>();
 
-    //NetworkVariable<int> _countRest
-    NetworkVariable<int> _round = new NetworkVariable<int>(1);
-    NetworkVariable<float> _entryTime = new NetworkVariable<float>();
+    [HideInInspector] public NetworkVariable<int> NumsOfObjTrackedCurrentRound = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     private Coroutine countdownCoroutine;
+    private bool _isRestRound;
 
     protected override void Awake()
     {
         base.Awake();
         CountTime.OnValueChanged += OnCountTimeChanged;
         CountRound.OnValueChanged += OnCountRoundChanged;
+        NumsOfObjTrackedCurrentRound.OnValueChanged += OnNumberTrackedChange;
     }
 
     public override void OnDestroy()
@@ -33,6 +35,7 @@ public class RoundManager : NetworkSingleton<RoundManager>
         base.OnDestroy();
         CountTime.OnValueChanged -= OnCountTimeChanged;
         CountRound.OnValueChanged -= OnCountRoundChanged;
+        NumsOfObjTrackedCurrentRound.OnValueChanged -= OnNumberTrackedChange;
     }
 
     private string FormatTime(int totalSeconds)
@@ -52,6 +55,36 @@ public class RoundManager : NetworkSingleton<RoundManager>
         _txtTimer.text = FormatTime(newValue);
     }
 
+    private void OnNumberTrackedChange(int previousValue, int newValue)
+    {
+        if (IsServer)
+        {
+            if (newValue == DEFAULT_MAX_OBJECT_TRACKED)
+            {
+                if (CountRound.Value == NumOfRounds.Value)
+                {
+                    StopAllCoroutines();
+                    StartCoroutine(DelayNotify1());
+                    //Debug.Log("stop countdown, done match");
+                    return;
+                }
+
+                _isRestRound = true;
+                StopCoroutine(countdownCoroutine);
+                StartCoroutine(CountdownCoroutine());
+                //Debug.Log("max object round " + CountRound.Value + " reached!");
+            }
+        }
+    }
+
+    //delay notify đợi tween bên score xong nó gửi data lên sv đã r hẵng notify1
+    private IEnumerator DelayNotify1()
+    {
+        yield return new WaitForSeconds(_delay);
+
+        NotifyWinnerClientRpc();
+    }
+
     #region RPCs
 
     [ServerRpc]
@@ -65,8 +98,10 @@ public class RoundManager : NetworkSingleton<RoundManager>
     [ClientRpc]
     private void GiveHintClientRpc(int currentRound = 1)
     {
+        //NumsOfObjTrackedCurrentRound.Value = DEFAULT_MAX_OBJECT_TRACKED;
         EventsManager.Instance.Notify(EventID.OnReceiveQuest, currentRound);
         QuestManager.Instance.IsRestRound = false;
+        _isRestRound = false;
     }
 
     [ClientRpc]
@@ -89,7 +124,6 @@ public class RoundManager : NetworkSingleton<RoundManager>
 
     private void StartCount()
     {
-        _entryTime.Value = Time.time;
         CountRound.Value = FIRST_ROUND;
         CountTime.Value = RoundTimer.Value;
         //Debug.Log("Client started timer");
@@ -110,9 +144,10 @@ public class RoundManager : NetworkSingleton<RoundManager>
     {
         while (CountRound.Value <= NumOfRounds.Value)
         {
-            UIManager.Instance.ToggleButtonShop(false);
+            if (!_isRestRound)
+                UIManager.Instance.ToggleButtonShop(false);
 
-            while (CountTime.Value > 0)
+            while (CountTime.Value > 0 && !_isRestRound)
             {
                 yield return new WaitForSeconds(1f);
                 CountTime.Value -= 1;
@@ -120,7 +155,7 @@ public class RoundManager : NetworkSingleton<RoundManager>
             }
 
             //found a winner
-            if (CountRound.Value == NumOfRounds.Value)
+            if (CountRound.Value == NumOfRounds.Value && !_isRestRound)
             {
                 NotifyWinnerClientRpc();
                 yield break;
@@ -138,6 +173,7 @@ public class RoundManager : NetworkSingleton<RoundManager>
 
             CountRound.Value++;
             CountTime.Value = RoundTimer.Value;
+            NumsOfObjTrackedCurrentRound.Value = 0;
             GiveHintClientRpc(CountRound.Value);
             UIManager.Instance.ToggleButtonShop(false);
             string content = "Start round " + CountRound.Value + "!";

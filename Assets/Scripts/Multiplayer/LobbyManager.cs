@@ -197,7 +197,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
                 _joinedLobby = _hostLobby;
                 _playerIndex = INDEX_OF_HOST;
                 RoundManager.Instance.NumOfRounds.Value = 2;// numOfRounds;
-                RoundManager.Instance.RoundTimer.Value = 15;
+                RoundManager.Instance.RoundTimer.Value = 20;
                 RoundManager.Instance.PrepTimer.Value = timePrep;
 
                 try

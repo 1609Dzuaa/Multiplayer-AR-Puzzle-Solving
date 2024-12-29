@@ -32,13 +32,15 @@ public class ScoreController : MonoBehaviour
     private void AddScore(object obj)
     {
         Question questInfo = (Question)obj;
-        DOTween.To(() => _score, x => _score = x, _score + questInfo.Score, _duration).OnUpdate(
+        int scoreReceived =  questInfo.Score - QuestManager.Instance.ScoreDecrease * RoundManager.Instance.NumsOfObjTrackedCurrentRound.Value;
+        DOTween.To(() => _score, x => _score = x, _score + scoreReceived, _duration).OnUpdate(
             () => _txtScore.text = "Score: " + _score.ToString()).OnComplete(
             () =>
             {
                 _pData.Score = _score;
                 //bắn event kêu host update data
                 EventsManager.Instance.Notify(EventID.OnUpdatePlayerData, _pData);
+                Debug.Log("done tween score");
             });
     }
 
@@ -51,6 +53,7 @@ public class ScoreController : MonoBehaviour
 
     private void SendDataToHost(object obj)
     {
+        Debug.Log("send data to host");
         EventsManager.Instance.Notify(EventID.OnNotifyWinner2, _pData);
     }
 }

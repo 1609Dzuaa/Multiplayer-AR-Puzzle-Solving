@@ -15,4 +15,5 @@ public static class GameConst
     public const int INDEX_OF_HOST = 0;
     public const int FIRST_ROUND = 1;
     public const int PLUS_ONE_BECAUSE_IS_INDEX = 1;
+    public const int DEFAULT_MAX_OBJECT_TRACKED = 2;
 }

@@ -26,7 +26,8 @@ public class RewardController : HintController
     private void ReceiveData(object obj)
     {
         Question questInfo = (Question)obj;
-        _txtHint.text = "You Receive " + questInfo.Score + " Points!";
+        int scoreReceived = questInfo.Score - QuestManager.Instance.ScoreDecrease * RoundManager.Instance.NumsOfObjTrackedCurrentRound.Value;
+        _txtHint.text = "You Receive " + scoreReceived + " Points!";
     }
 
     protected override void ButtonLeftClick()

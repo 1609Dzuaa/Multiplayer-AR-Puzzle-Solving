@@ -5191,6 +5191,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 216025b34a6be4d4aac9cd944603f259, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ScoreDecrease: 5
   ListQuest:
   - {fileID: 11400000, guid: 8347dc6296efcb146b8eb98bf9cbc00b, type: 2}
   - {fileID: 11400000, guid: c3c38c340716a5547827c662bb1b1df2, type: 2}
@@ -5198,6 +5199,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e38795edfe028b2428ae98525ca6c6dc, type: 2}
   - {fileID: 11400000, guid: 2f7dc0d9891636e43afc4b31c9ba5f13, type: 2}
   CurrentRound: 0
+  IsRestRound: 0
 --- !u!1 &1154765690
 GameObject:
   m_ObjectHideFlags: 0

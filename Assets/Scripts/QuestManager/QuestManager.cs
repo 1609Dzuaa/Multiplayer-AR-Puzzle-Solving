@@ -5,6 +5,7 @@ using static GameConst;
 
 public class QuestManager : BaseSingleton<QuestManager>
 {
+    public int ScoreDecrease;
     public List<Question> ListQuest;
     [HideInInspector] public int CurrentRound = FIRST_ROUND;
     [HideInInspector] public bool IsRestRound;

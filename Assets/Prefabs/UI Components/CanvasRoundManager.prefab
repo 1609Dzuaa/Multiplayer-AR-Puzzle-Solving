@@ -139,6 +139,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _txtTimer: {fileID: 3146891283068050332}
   _txtRound: {fileID: 6608226174824109931}
+  _delay: 2
   CountRound:
     m_InternalValue: 0
   NumOfRounds:
@@ -148,6 +149,8 @@ MonoBehaviour:
   PrepTimer:
     m_InternalValue: 0
   CountTime:
+    m_InternalValue: 0
+  NumsOfObjTrackedCurrentRound:
     m_InternalValue: 0
 --- !u!1 &381557221783179445
 GameObject:
