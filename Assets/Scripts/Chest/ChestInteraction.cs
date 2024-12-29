@@ -95,7 +95,7 @@ public class ChestInteraction : NetworkBehaviour
     {
         //gửi thông tin của quest ở đây
         //track thành công thì bắn thông tin đi;
-        QuestManager.Instance.RemoveQuest();
+        //QuestManager.Instance.RemoveQuest();
         EventsManager.Instance.Notify(EventID.OnTrackedImageSuccess, _questInfo);
         UIManager.Instance.TogglePopup(EPopupID.PopupReward, true);
         //QuestManager.Instance.RemoveQuest(_questInfo);

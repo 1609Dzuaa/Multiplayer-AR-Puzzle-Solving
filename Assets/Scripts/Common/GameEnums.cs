@@ -17,6 +17,9 @@ public static class GameEnums
         OnRefreshLeaderboard,
         OnUpdatePlayerData, //gửi thông tin player để cập nhật bxh
         OnReceiveQuest, //từ host gửi cho tất cả player quest mới
+        OnNotifyWinner1, //từ round thông báo cho score
+        OnNotifyWinner2, //từ score gửi data lên host
+        OnPopupWinner,
 
     }
 

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -18,6 +18,7 @@ public class ScoreController : MonoBehaviour
         _txtScore = GetComponent<TextMeshProUGUI>();
         EventsManager.Instance.Subscribe(EventID.OnTrackedImageSuccess, AddScore);
         EventsManager.Instance.Subscribe(EventID.OnCanPlay, ReceivePlayerData);
+        EventsManager.Instance.Subscribe(EventID.OnNotifyWinner1, SendDataToHost);
         Debug.Log("Score sub");
     }
 
@@ -25,6 +26,7 @@ public class ScoreController : MonoBehaviour
     {
         EventsManager.Instance.Unsubscribe(EventID.OnTrackedImageSuccess, AddScore);
         EventsManager.Instance.Unsubscribe(EventID.OnCanPlay, ReceivePlayerData);
+        EventsManager.Instance.Unsubscribe(EventID.OnNotifyWinner1, SendDataToHost);
     }
 
     private void AddScore(object obj)
@@ -35,13 +37,20 @@ public class ScoreController : MonoBehaviour
             () =>
             {
                 _pData.Score = _score;
+                //bắn event kêu host update data
                 EventsManager.Instance.Notify(EventID.OnUpdatePlayerData, _pData);
             });
     }
 
+    //bắn từ host cho phép chơi và cache data của bản thân player này tại đây
     private void ReceivePlayerData(object obj)
     {
         _pData = (PlayerData)obj;
-        Debug.Log("Can Play: " + _pData.Name);
+        //Debug.Log("Can Play: " + _pData.Name);
+    }
+
+    private void SendDataToHost(object obj)
+    {
+        EventsManager.Instance.Notify(EventID.OnNotifyWinner2, _pData);
     }
 }

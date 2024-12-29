@@ -78,11 +78,15 @@ public class TrackedImageInfo : MonoBehaviour
         if (_dictSpawnPrefabs.ContainsKey(name))
         {
             Question quest = QuestManager.Instance.ListQuest.Find(x => x.ImageName == name);
-            if (QuestManager.Instance.CurrentRound == quest.Round)
+            if (!quest)
+            {
+                Debug.Log("quest image " + name + " at round " + QuestManager.Instance.CurrentRound + " get null");
+            }
+            if (quest && QuestManager.Instance.CurrentRound == quest.Round)
             {
                 GameObject prefab = _dictSpawnPrefabs[name];
                 prefab.transform.position = position;
-                prefab.SetActive(true);
+                prefab.SetActive(QuestManager.Instance.IsRestRound ? false : true);
 
                 if (!quest) Debug.Log("Question of image: " + name + " get null");
                 else EventsManager.Instance.Notify(EventID.OnReceiveQuestInfo, quest);

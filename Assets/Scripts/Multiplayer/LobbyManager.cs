@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using Unity.Netcode;
 using Unity.Services.Authentication;
@@ -30,6 +31,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         _listPlayers.OnListChanged += ListPlayersOnChanged;
         //_playerIndex.OnValueChanged += OnSomeValueChanged;
         EventsManager.Instance.Subscribe(EventID.OnUpdatePlayerData, UpdatePlayerData);
+        EventsManager.Instance.Subscribe(EventID.OnNotifyWinner2, NotifyWinner);
 
         await UnityServices.InitializeAsync();
 
@@ -47,6 +49,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         base.OnDestroy();
         _listPlayers.OnListChanged -= ListPlayersOnChanged;
         EventsManager.Instance.Unsubscribe(EventID.OnUpdatePlayerData, UpdatePlayerData);
+        EventsManager.Instance.Unsubscribe(EventID.OnNotifyWinner2, NotifyWinner);
     }
 
     #endregion
@@ -91,6 +94,8 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         Debug.Log("List changed");
     }
 
+    #region Event's Callbacks
+
     private void UpdatePlayerData(object obj)
     {
         PlayerData playerData = (PlayerData)obj;
@@ -105,6 +110,23 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
             UpdatePlayerDataServerRpc(playerData, _playerIndex);
         }
     }
+
+    private void NotifyWinner(object obj)
+    {
+        if (IsServer)
+        {
+            PlayerData thisPlayer = (PlayerData)obj;
+            //do networkList 0 hỗ trợ Linq
+            List<PlayerData> tempList = new();
+            foreach (var player in _listPlayers)
+                tempList.Add(player);
+
+            tempList = tempList.OrderByDescending(x => x.Score).ToList();
+            PopupWinnerClientRpc(tempList.ToArray());
+        }
+    }
+
+    #endregion
 
     #region Lobby's Hearbeat
 
@@ -174,8 +196,8 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
                 _hostLobby = lobby;
                 _joinedLobby = _hostLobby;
                 _playerIndex = INDEX_OF_HOST;
-                RoundManager.Instance.NumOfRounds.Value = numOfRounds;
-                RoundManager.Instance.RoundTimer.Value = timeLimit;
+                RoundManager.Instance.NumOfRounds.Value = 2;// numOfRounds;
+                RoundManager.Instance.RoundTimer.Value = 15;
                 RoundManager.Instance.PrepTimer.Value = timePrep;
 
                 try
@@ -239,7 +261,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         //playerIndex = _listPlayers.Count;
         UpdatePlayerIndexClientRpc(_listPlayers.Count, clientId);
         _listPlayers.Add(data);
-        Debug.Log("add " +  data.Name);
+        //Debug.Log("add " +  data.Name);
         if (_listPlayers.Count == DEFAULT_TOTAL_PLAYER_TO_PLAY && !_startCount)
         {
             _startCount = true;
@@ -259,7 +281,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     private void AllowToPlayClientRpc()
     {
         EventsManager.Instance.Notify(EventID.OnCanPlay, _pData);
-        Debug.Log("Fire Can Play:" + _pData.Name);
+        //Debug.Log("Fire Can Play:" + _pData.Name);
     }
 
     [ServerRpc]
@@ -269,15 +291,35 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         //Debug.Log("Update Data");
     }
 
+    [ClientRpc]
+    private void PopupWinnerClientRpc(PlayerData[] arrOrdered)
+    {
+        int rank = arrOrdered.ToList().FindIndex(x => x.Name == _pData.Name) + PLUS_ONE_BECAUSE_IS_INDEX;
+        _pData.Rank = rank;
+        PlayerData winner = arrOrdered[0];
+        if (IsServer)
+        {
+            winner.Rank = _pData.Rank;
+            _pData = winner;
+        }
+        PlayerData[] param = { winner, _pData };
+        EventsManager.Instance.Notify(EventID.OnPopupWinner, param);
+    }
+
+    #endregion
+
     private void UpdatePlayer(PlayerData data, int playerIndex)
     {
-        Debug.Log("player, index: " + data.Name + ", " + playerIndex);
+        //Debug.Log("player, index: " + data.Name + ", " + playerIndex);
         _listPlayers[playerIndex] = data;
         //foreach (var player in _listPlayers)
             //Debug.Log("name, score: " + player.Name + ", " + player.Score);
     }
 
-    #endregion
+    private void PopupWinner()
+    {
+
+    }
 
     private void OnLobbyChanged(ILobbyChanges changes)
     {
@@ -297,7 +339,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
                 //RelayManager.Instance.JoinRelay(_joinedLobby.Data[KEY_RELAY_CODE].Value);
                 //Debug.Log("Join Relay when lobby changes: ");
             }
-            Debug.Log("Lobby changed");
+            //Debug.Log("Lobby changed");
         }
     }
 

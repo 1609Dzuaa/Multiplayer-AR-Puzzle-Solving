@@ -1785,11 +1785,11 @@ MonoBehaviour:
   m_Value: 0
   m_Options:
     m_Options:
-    - m_Text: 20 Seconds
-      m_Image: {fileID: 0}
     - m_Text: 30 Seconds
       m_Image: {fileID: 0}
     - m_Text: 40 Seconds
+      m_Image: {fileID: 0}
+    - m_Text: 50 Seconds
       m_Image: {fileID: 0}
   m_OnValueChanged:
     m_PersistentCalls:
@@ -2611,7 +2611,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 20 Seconds
+  m_text: 30 Seconds
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: eaa8615fe26a04e49a30d6f37a6b4954, type: 2}
   m_sharedMaterial: {fileID: -4001293270552118757, guid: eaa8615fe26a04e49a30d6f37a6b4954,

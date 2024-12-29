@@ -66,6 +66,7 @@ public class RoundManager : NetworkSingleton<RoundManager>
     private void GiveHintClientRpc(int currentRound = 1)
     {
         EventsManager.Instance.Notify(EventID.OnReceiveQuest, currentRound);
+        QuestManager.Instance.IsRestRound = false;
     }
 
     [ClientRpc]
@@ -74,6 +75,14 @@ public class RoundManager : NetworkSingleton<RoundManager>
         _txtRound.text = "Rest Round";
         string content = "End of round " + CountRound.Value +", head to the Shop and buy some Power-ups";
         ShowNotification.Show(content, () => { });
+        UIManager.Instance.ToggleButtonShop(true);
+        QuestManager.Instance.IsRestRound = true;
+    }
+
+    [ClientRpc]
+    private void NotifyWinnerClientRpc()
+    {
+        EventsManager.Instance.Notify(EventID.OnNotifyWinner1);
     }
 
     #endregion
@@ -101,11 +110,20 @@ public class RoundManager : NetworkSingleton<RoundManager>
     {
         while (CountRound.Value <= NumOfRounds.Value)
         {
+            UIManager.Instance.ToggleButtonShop(false);
+
             while (CountTime.Value > 0)
             {
                 yield return new WaitForSeconds(1f);
                 CountTime.Value -= 1;
                 _txtTimer.text = FormatTime(CountTime.Value);
+            }
+
+            //found a winner
+            if (CountRound.Value == NumOfRounds.Value)
+            {
+                NotifyWinnerClientRpc();
+                yield break;
             }
 
             //rest round
@@ -121,6 +139,9 @@ public class RoundManager : NetworkSingleton<RoundManager>
             CountRound.Value++;
             CountTime.Value = RoundTimer.Value;
             GiveHintClientRpc(CountRound.Value);
+            UIManager.Instance.ToggleButtonShop(false);
+            string content = "Start round " + CountRound.Value + "!";
+            ShowNotification.Show(content, () => { });
             //Debug.Log("Finish a round: " + CountRound.Value + "/" + CountTime.Value);
         }
 

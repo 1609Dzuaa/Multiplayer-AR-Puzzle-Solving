@@ -9,7 +9,7 @@ public class PopupController : MonoBehaviour
     [SerializeField] protected Ease _popupEase;
     protected bool _isFirstOnEnable = true;
 
-    protected void OnEnable()
+    protected virtual void OnEnable()
     {
         if (_isFirstOnEnable)
         {
@@ -41,7 +41,7 @@ public class PopupController : MonoBehaviour
         //Debug.Log("Tween child called");
     }
 
-    protected void OnDisable()
+    protected virtual void OnDisable()
     {
         transform.DOScale(0.0f, _popupDuration);
         ResetComponent();

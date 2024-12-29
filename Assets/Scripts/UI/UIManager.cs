@@ -28,6 +28,7 @@ public class UIManager : BaseSingleton<UIManager>
     [SerializeField] Transform _mainContent;
     [SerializeField] float _distance;
     [SerializeField] float _duration;
+    [SerializeField] GameObject _btnShop;
 
     [Header("Các main component của AR system, mới vào thì giấu nó đi để tránh bug")]
     [SerializeField] Transform[] _arrARComponents; //đừng active component "UI" trước các component khác
@@ -51,6 +52,7 @@ public class UIManager : BaseSingleton<UIManager>
         UIManager.Instance.Tutorial.SetActive(false);
         UIManager.Instance.Setting.SetActive(false);
         UIManager.Instance.About.SetActive(false);
+        _btnShop.SetActive(false);
         /*EventsManager.Instance.Subscribe(EventID.OnLogoTweenCompleted, TweenButtons);
         EventsManager.Instance.Subscribe(EventID.OnStartGame, StartGame);
         EventsManager.Instance.Subscribe(EventID.OnCheckGameplayState, CheckGameplayState);*/
@@ -113,10 +115,10 @@ public class UIManager : BaseSingleton<UIManager>
                 if (joinedLobby != null)
                 {
                     CheckGameplayState(joinedLobby);
-                    Debug.Log("Check trong Start");
+                    //Debug.Log("Check trong Start");
                 }
-                else
-                    Debug.Log("Lobby null 0 check");
+                //else
+                    //Debug.Log("Lobby null 0 check");
             });
         });
     }
@@ -132,13 +134,13 @@ public class UIManager : BaseSingleton<UIManager>
             {
                 if (_dictPopups[EPopupID.PopupInformation].activeInHierarchy)
                 {
-                    Debug.Log("in4 false");
+                    //Debug.Log("in4 false");
                     TogglePopup(EPopupID.PopupInformation, false);
                 }
                 if (!_canPlay)
                 {
                     TogglePopup(EPopupID.PopupEnterName, true);
-                    Debug.Log("popup enter name");
+                    //Debug.Log("popup enter name");
                 }
 
                 //for (int i = 0; i < _arrARComponents.Length; i++)
@@ -211,4 +213,6 @@ public class UIManager : BaseSingleton<UIManager>
         }
         _dimmedBG.gameObject.SetActive(false);
     }
+
+    public void ToggleButtonShop(bool On) => _btnShop.SetActive(On);
 }
