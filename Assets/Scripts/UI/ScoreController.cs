@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using static GameEnums;
+using static GameConst;
 using DG.Tweening;
 
 public class ScoreController : MonoBehaviour
@@ -32,7 +33,15 @@ public class ScoreController : MonoBehaviour
     private void AddScore(object obj)
     {
         Question questInfo = (Question)obj;
-        int scoreReceived =  questInfo.Score - QuestManager.Instance.ScoreDecrease * RoundManager.Instance.NumsOfObjTrackedCurrentRound.Value;
+        int scoreLeftFromObject = QuestManager.Instance.ScoreDecrease * RoundManager.Instance.NumsOfObjTrackedCurrentRound.Value;
+        int scoreReceived = questInfo.Score - scoreLeftFromObject;
+
+        if (PowerupManager.Instance.DoubleScore)
+            scoreReceived *= DOUBLE;
+
+        if (PowerupManager.Instance.Stake)
+            scoreReceived += PowerupManager.Instance.ScoreStakeIncrease;
+
         DOTween.To(() => _score, x => _score = x, _score + scoreReceived, _duration).OnUpdate(
             () => _txtScore.text = "Score: " + _score.ToString()).OnComplete(
             () =>

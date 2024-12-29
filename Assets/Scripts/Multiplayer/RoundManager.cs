@@ -96,12 +96,21 @@ public class RoundManager : NetworkSingleton<RoundManager>
     }
 
     [ClientRpc]
-    private void GiveHintClientRpc(int currentRound = 1)
+    private void ResetNewRoundClientRpc(int currentRound = 1)
     {
         //NumsOfObjTrackedCurrentRound.Value = DEFAULT_MAX_OBJECT_TRACKED;
         EventsManager.Instance.Notify(EventID.OnReceiveQuest, currentRound);
         QuestManager.Instance.IsRestRound = false;
         _isRestRound = false;
+        UIManager.Instance.ToggleButtonShop(false);
+        string content = "Start round " + CountRound.Value + "!";
+        ShowNotification.Show(content, () => { });
+    }
+
+    [ClientRpc]
+    private void ResetPowerupClientRpc()
+    {
+        PowerupManager.Instance.ResetPowerups();
     }
 
     [ClientRpc]
@@ -112,6 +121,11 @@ public class RoundManager : NetworkSingleton<RoundManager>
         ShowNotification.Show(content, () => { });
         UIManager.Instance.ToggleButtonShop(true);
         QuestManager.Instance.IsRestRound = true;
+        if (PowerupManager.Instance.Stake && !PowerupManager.Instance.HintSolved)
+        {
+            Debug.Log("At rest round but hasn't finished solved question!");
+            EventsManager.Instance.Notify(EventID.OnStakeDecrease);
+        }
     }
 
     [ClientRpc]
@@ -131,7 +145,7 @@ public class RoundManager : NetworkSingleton<RoundManager>
         _txtRound.text = "Round " + 1.ToString() + "/" + NumOfRounds.Value.ToString();
         _txtTimer.text = FormatTime(CountTime.Value);
         StartCountdown();
-        GiveHintClientRpc();
+        ResetNewRoundClientRpc();
     }
 
     public void StartCountdown()
@@ -163,6 +177,7 @@ public class RoundManager : NetworkSingleton<RoundManager>
 
             //rest round
             StartRestClientRpc();
+            ResetPowerupClientRpc();
             CountTime.Value = PrepTimer.Value;
 
             while (CountTime.Value > 0)
@@ -174,10 +189,8 @@ public class RoundManager : NetworkSingleton<RoundManager>
             CountRound.Value++;
             CountTime.Value = RoundTimer.Value;
             NumsOfObjTrackedCurrentRound.Value = 0;
-            GiveHintClientRpc(CountRound.Value);
-            UIManager.Instance.ToggleButtonShop(false);
-            string content = "Start round " + CountRound.Value + "!";
-            ShowNotification.Show(content, () => { });
+            ResetNewRoundClientRpc(CountRound.Value);
+
             //Debug.Log("Finish a round: " + CountRound.Value + "/" + CountTime.Value);
         }
 

@@ -96,6 +96,8 @@ public class ChestInteraction : NetworkBehaviour
         //gửi thông tin của quest ở đây
         //track thành công thì bắn thông tin đi;
         //QuestManager.Instance.RemoveQuest();
+        if (PowerupManager.Instance.Stake)
+            PowerupManager.Instance.HintSolved = true;
         EventsManager.Instance.Notify(EventID.OnTrackedImageSuccess, _questInfo);
         UIManager.Instance.TogglePopup(EPopupID.PopupReward, true);
         if (NetworkManager.Singleton.IsHost)

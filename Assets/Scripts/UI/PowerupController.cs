@@ -14,7 +14,7 @@ public class PowerupController : MonoBehaviour
 
     public void PowerupOnClick()
     {
-
+        LobbyManager.Instance.PurchaseItem(powerup);
     }
 
     public void Setup(Powerup powerup)

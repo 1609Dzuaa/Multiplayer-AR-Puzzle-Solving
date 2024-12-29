@@ -20,6 +20,7 @@ public static class GameEnums
         OnNotifyWinner1, //từ round thông báo cho score
         OnNotifyWinner2, //từ score gửi data lên host
         OnPopupWinner,
+        OnStakeDecrease,
 
     }
 
@@ -44,4 +45,5 @@ public static class GameEnums
         Button1SFX,
         Button2SFX,
     }
+
 }

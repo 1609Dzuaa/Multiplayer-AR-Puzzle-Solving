@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using static GameEnums;
+using static GameConst;
 
 public class RewardController : HintController
 {
@@ -27,6 +28,11 @@ public class RewardController : HintController
     {
         Question questInfo = (Question)obj;
         int scoreReceived = questInfo.Score - QuestManager.Instance.ScoreDecrease * RoundManager.Instance.NumsOfObjTrackedCurrentRound.Value;
+        if (PowerupManager.Instance.DoubleScore)
+            scoreReceived *= DOUBLE;
+
+        if (PowerupManager.Instance.Stake)
+            scoreReceived += PowerupManager.Instance.ScoreStakeIncrease;
         _txtHint.text = "You Receive " + scoreReceived + " Points!";
     }
 

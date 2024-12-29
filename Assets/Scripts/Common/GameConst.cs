@@ -16,4 +16,10 @@ public static class GameConst
     public const int FIRST_ROUND = 1;
     public const int PLUS_ONE_BECAUSE_IS_INDEX = 1;
     public const int DEFAULT_MAX_OBJECT_TRACKED = 2;
+    public const string DOUBLE_SCORE = "Double Point";
+    public const string STAKE = "Stake";
+    public const string BOMB = "Bomb";
+    public const string SHIELD = "Shield";
+
+    public const int DOUBLE = 2;
 }

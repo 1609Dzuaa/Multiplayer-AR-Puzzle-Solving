@@ -32,6 +32,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         //_playerIndex.OnValueChanged += OnSomeValueChanged;
         EventsManager.Instance.Subscribe(EventID.OnUpdatePlayerData, UpdatePlayerData);
         EventsManager.Instance.Subscribe(EventID.OnNotifyWinner2, NotifyWinner);
+        EventsManager.Instance.Subscribe(EventID.OnStakeDecrease, StakeDecreaseScore);
 
         await UnityServices.InitializeAsync();
 
@@ -50,6 +51,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         _listPlayers.OnListChanged -= ListPlayersOnChanged;
         EventsManager.Instance.Unsubscribe(EventID.OnUpdatePlayerData, UpdatePlayerData);
         EventsManager.Instance.Unsubscribe(EventID.OnNotifyWinner2, NotifyWinner);
+        EventsManager.Instance.Unsubscribe(EventID.OnStakeDecrease, StakeDecreaseScore);
     }
 
     #endregion
@@ -99,6 +101,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     private void UpdatePlayerData(object obj)
     {
         PlayerData playerData = (PlayerData)obj;
+        _pData = playerData;
         if (IsServer)
         {
             Debug.Log("server update player");
@@ -124,6 +127,17 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
             tempList = tempList.OrderByDescending(x => x.Score).ToList();
             PopupWinnerClientRpc(tempList.ToArray());
         }
+    }
+
+    private void StakeDecreaseScore(object obj)
+    {
+        _pData.Score -= PowerupManager.Instance.ScoreStakeDecrease;
+        List<PlayerData> tempList = new();
+        foreach (var player in _listPlayers)
+            tempList.Add(player);
+        int index = tempList.FindIndex(x => x.Name == _pData.Name);
+        _listPlayers[index] = _pData;
+        Debug.Log("player: " + _pData.Name + " get deducted " + PowerupManager.Instance.ScoreStakeDecrease);
     }
 
     #endregion
@@ -198,7 +212,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
                 _playerIndex = INDEX_OF_HOST;
                 RoundManager.Instance.NumOfRounds.Value = 2;// numOfRounds;
                 RoundManager.Instance.RoundTimer.Value = 20;
-                RoundManager.Instance.PrepTimer.Value = timePrep;
+                RoundManager.Instance.PrepTimer.Value = 15;//timePrep;
 
                 try
                 {
@@ -537,4 +551,20 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         }
     }
 
+    public void PurchaseItem(Powerup powerup)
+    {
+        Debug.Log("player, score: " + _pData.Name + ", " + _pData.Score);
+        if (powerup.Price <= _pData.Score)
+        {
+            PowerupManager.Instance.HandlePurchasePowerup(powerup);
+        }
+        else
+        {
+            string content = "Not enough score to buy";
+            NotificationParam param = new NotificationParam(content, () => { });
+            UIManager.Instance.TogglePopup(EPopupID.PopupInformation, true);
+            EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
+            ShowNotification.Show(content);
+        }
+    }
 }
