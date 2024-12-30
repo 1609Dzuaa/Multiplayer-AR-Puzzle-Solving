@@ -14,7 +14,7 @@ public class QuestManager : BaseSingleton<QuestManager>
     {
         //CurrentRound += 
         CurrentRound = questIndex + 1;
-        Debug.Log("Get quest index: " + questIndex);
+        //Debug.Log("Get quest index: " + questIndex);
         return ListQuest[questIndex];
     }
 

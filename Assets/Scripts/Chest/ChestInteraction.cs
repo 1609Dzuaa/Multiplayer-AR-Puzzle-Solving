@@ -100,17 +100,15 @@ public class ChestInteraction : NetworkBehaviour
             PowerupManager.Instance.HintSolved = true;
         EventsManager.Instance.Notify(EventID.OnTrackedImageSuccess, _questInfo);
         UIManager.Instance.TogglePopup(EPopupID.PopupReward, true);
-        if (NetworkManager.Singleton.IsHost)
-            RoundManager.Instance.NumsOfObjTrackedCurrentRound.Value++;
-        else if (IsOwner)
+        if (RoundManager.Instance.IsHost)
         {
-            Debug.Log("client found");
-            RoundManager.Instance.NumsOfObjTrackedCurrentRound.Value++;
+            //Debug.Log("host incre count");
+            RoundManager.Instance.IncreaseCountServerRpc();
         }
-        else
+        else if (RoundManager.Instance.IsOwner)
         {
-            Debug.Log("none of them");
-            RoundManager.Instance.NumsOfObjTrackedCurrentRound.Value++;
+            //Debug.Log("client owner incre count");
+            RoundManager.Instance.IncreaseCountServerRpc();
         }
         //QuestManager.Instance.RemoveQuest(_questInfo);
     }

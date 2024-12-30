@@ -42,6 +42,9 @@ public class ScoreController : MonoBehaviour
         if (PowerupManager.Instance.Stake)
             scoreReceived += PowerupManager.Instance.ScoreStakeIncrease;
 
+        if (RoundManager.Instance.IsBombed.Value)
+            scoreReceived = 0;
+            
         DOTween.To(() => _score, x => _score = x, _score + scoreReceived, _duration).OnUpdate(
             () => _txtScore.text = "Score: " + _score.ToString()).OnComplete(
             () =>
@@ -49,7 +52,7 @@ public class ScoreController : MonoBehaviour
                 _pData.Score = _score;
                 //bắn event kêu host update data
                 EventsManager.Instance.Notify(EventID.OnUpdatePlayerData, _pData);
-                Debug.Log("done tween score");
+                //Debug.Log("done tween score");
             });
     }
 

@@ -93,7 +93,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         EventsManager.Instance.Notify(EventID.OnRefreshLeaderboard, tempArr);
 
         RefreshLeaderboardClientRpc(tempArr);
-        Debug.Log("List changed");
+        //Debug.Log("List changed");
     }
 
     #region Event's Callbacks
@@ -104,12 +104,12 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         _pData = playerData;
         if (IsServer)
         {
-            Debug.Log("server update player");
+            //Debug.Log("server update player");
             UpdatePlayer(playerData, _playerIndex);
         }
         else if (IsOwner)
         {
-            Debug.Log("client update player");
+            //Debug.Log("client update player");
             UpdatePlayerDataServerRpc(playerData, _playerIndex);
         }
     }

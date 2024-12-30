@@ -18,7 +18,8 @@ public class RoundManager : NetworkSingleton<RoundManager>
     [HideInInspector] public NetworkVariable<int> PrepTimer = new NetworkVariable<int>();
     [HideInInspector] public NetworkVariable<int> CountTime = new NetworkVariable<int>();
 
-    [HideInInspector] public NetworkVariable<int> NumsOfObjTrackedCurrentRound = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+    [HideInInspector] public NetworkVariable<int> NumsOfObjTrackedCurrentRound = new NetworkVariable<int>();
+    [HideInInspector] public NetworkVariable<bool> IsBombed = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
     private Coroutine countdownCoroutine;
     private bool _isRestRound;
 
@@ -93,6 +94,19 @@ public class RoundManager : NetworkSingleton<RoundManager>
         CountTime.OnValueChanged += OnCountTimeChanged;
         CountRound.OnValueChanged += OnCountRoundChanged;
         StartCount();
+    }
+
+    [ServerRpc]
+    public void IncreaseCountServerRpc()
+    {
+        NumsOfObjTrackedCurrentRound.Value++;
+        //Debug.Log("Increase count: " + NumsOfObjTrackedCurrentRound.Value);
+    }
+
+    [ServerRpc]
+    public void HandleBombServerRpc(bool isDefused)
+    {
+        IsBombed.Value = isDefused;
     }
 
     [ClientRpc]

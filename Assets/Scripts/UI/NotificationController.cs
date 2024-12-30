@@ -72,6 +72,11 @@ public class NotificationController : HintController
             _btnYes.onClick.AddListener(param.YesCallback);
     }
 
+    public void OnClose()
+    {
+        UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false);
+    }
+
     protected override void ButtonLeftClick()
     {
         UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false);
