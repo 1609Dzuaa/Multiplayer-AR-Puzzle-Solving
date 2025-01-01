@@ -9,4 +9,10 @@ public class LeaveController : PopupController
     {
         UIManager.Instance.TogglePopup(EPopupID.PopupLeaveGame, false);
     }
+
+    public void LeaveMatch()
+    {
+        LobbyManager.Instance.LeaveALobby();
+        EventsManager.Notify(EventID.OnReturnMenu);
+    }
 }

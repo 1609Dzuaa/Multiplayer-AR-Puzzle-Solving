@@ -21,6 +21,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     NetworkList<PlayerData> _listPlayers;
     PlayerData _pData;
     int _playerIndex = 0;
+    string _prevLobbyId;
 
     #region Init & Destroy
 
@@ -29,10 +30,10 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         base.Awake();
         _listPlayers = new NetworkList<PlayerData>();
         _listPlayers.OnListChanged += ListPlayersOnChanged;
-        //_playerIndex.OnValueChanged += OnSomeValueChanged;
-        EventsManager.Instance.Subscribe(EventID.OnUpdatePlayerData, UpdatePlayerData);
-        EventsManager.Instance.Subscribe(EventID.OnNotifyWinner2, NotifyWinner);
-        EventsManager.Instance.Subscribe(EventID.OnStakeDecrease, StakeDecreaseScore);
+        EventsManager.Subscribe(EventID.OnUpdatePlayerData, UpdatePlayerData);
+        EventsManager.Subscribe(EventID.OnNotifyWinner2, NotifyWinner);
+        EventsManager.Subscribe(EventID.OnStakeDecrease, StakeDecreaseScore);
+        EventsManager.Subscribe(EventID.OnEndMatch, HandleEndMatch);
 
         await UnityServices.InitializeAsync();
 
@@ -42,16 +43,19 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         };
 
         await AuthenticationService.Instance.SignInAnonymouslyAsync();
+        //DontDestroyOnLoad(gameObject);
         //RelayManager.Instance.CreateRelay();
     }
 
     public override void OnDestroy()
     {
+        //DontDestroyOnLoad(gameObject);
         base.OnDestroy();
         _listPlayers.OnListChanged -= ListPlayersOnChanged;
-        EventsManager.Instance.Unsubscribe(EventID.OnUpdatePlayerData, UpdatePlayerData);
-        EventsManager.Instance.Unsubscribe(EventID.OnNotifyWinner2, NotifyWinner);
-        EventsManager.Instance.Unsubscribe(EventID.OnStakeDecrease, StakeDecreaseScore);
+        EventsManager.Unsubscribe(EventID.OnUpdatePlayerData, UpdatePlayerData);
+        EventsManager.Unsubscribe(EventID.OnNotifyWinner2, NotifyWinner);
+        EventsManager.Unsubscribe(EventID.OnStakeDecrease, StakeDecreaseScore);
+        EventsManager.Unsubscribe(EventID.OnEndMatch, HandleEndMatch);
     }
 
     #endregion
@@ -65,6 +69,15 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     private void OnEnable()
     {
         NetworkManager.Singleton.OnClientConnectedCallback += HandleClientConnected;
+        NetworkManager.Singleton.OnClientDisconnectCallback += HandleClientDisconnect;
+    }
+
+    private void HandleClientDisconnect(ulong obj)
+    {
+        if (NetworkManager.Singleton.IsHost)
+        {
+            Debug.Log("IsHOST. a client disconnected");
+        }
     }
 
     private void OnDisable()
@@ -90,7 +103,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         for(int i = 0; i < tempArr.Length; i++)
             tempArr[i] = _listPlayers[i];
 
-        EventsManager.Instance.Notify(EventID.OnRefreshLeaderboard, tempArr);
+        EventsManager.Notify(EventID.OnRefreshLeaderboard, tempArr);
 
         RefreshLeaderboardClientRpc(tempArr);
         //Debug.Log("List changed");
@@ -146,7 +159,8 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
 
     private void Update()
     {
-        HandleLobbyHeartBeat();
+        if (_hostLobby != null)
+            HandleLobbyHeartBeat();
         /*if (_listPlayers != null)
             foreach (var p in _listPlayers)
                 Debug.Log("name, scr: " + p.Name + ", " + p.Score);*/
@@ -163,7 +177,14 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
                 float heartbeatTimerMax = 15f;
                 _heartBeatTimer = heartbeatTimerMax;
 
-                await LobbyService.Instance.SendHeartbeatPingAsync(_hostLobby.Id);
+                try
+                {
+                    await LobbyService.Instance.SendHeartbeatPingAsync(_hostLobby.Id);
+                }
+                catch (LobbyServiceException ex)
+                {
+                    Debug.Log(ex);
+                }
             }
         }
     }
@@ -210,7 +231,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
                 _hostLobby = lobby;
                 _joinedLobby = _hostLobby;
                 _playerIndex = INDEX_OF_HOST;
-                RoundManager.Instance.NumOfRounds.Value = 2;// numOfRounds;
+                RoundManager.Instance.NumOfRounds.Value = 1;// numOfRounds;
                 RoundManager.Instance.RoundTimer.Value = 20;
                 RoundManager.Instance.PrepTimer.Value = 15;//timePrep;
 
@@ -265,13 +286,19 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     [ClientRpc]
     private void RefreshLeaderboardClientRpc(PlayerData[] arrPlayers)
     {
-        EventsManager.Instance.Notify(EventID.OnRefreshLeaderboard, arrPlayers);
+        EventsManager.Notify(EventID.OnRefreshLeaderboard, arrPlayers);
+    }
+
+    [ClientRpc]
+    private void ReturnMenuClientRpc()
+    {
+        EventsManager.Notify(EventID.OnReturnMenu);
     }
 
     [ServerRpc(RequireOwnership = false)]
     private void SendPlayerDataServerRpc(PlayerData data, ulong clientId)
     {
-        //EventsManager.Instance.Notify(EventID.OnCanPlay, data);
+        //EventsManager.Notify(EventID.OnCanPlay, data);
         //playerIndex = _listPlayers.Count;
         UpdatePlayerIndexClientRpc(_listPlayers.Count, clientId);
         _listPlayers.Add(data);
@@ -284,6 +311,12 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         }
     }
 
+    [ServerRpc]
+    private void RemovePlayerServerRpc(PlayerData playerLeaved)
+    {
+        _listPlayers.Remove(playerLeaved);
+    }
+
     [ClientRpc]
     private void UpdatePlayerIndexClientRpc(int playerIndex, ulong clientId)
     {
@@ -294,7 +327,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     [ClientRpc]
     private void AllowToPlayClientRpc()
     {
-        EventsManager.Instance.Notify(EventID.OnCanPlay, _pData);
+        EventsManager.Notify(EventID.OnCanPlay, _pData);
         //Debug.Log("Fire Can Play:" + _pData.Name);
     }
 
@@ -317,7 +350,8 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
             _pData = winner;
         }
         PlayerData[] param = { winner, _pData };
-        EventsManager.Instance.Notify(EventID.OnPopupWinner, param);
+        object[] objs = { param, _listPlayers.Count };
+        EventsManager.Notify(EventID.OnPopupWinner, objs);
     }
 
     #endregion
@@ -349,7 +383,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
             if (changes.PlayerJoined.Changed && !_isRelayConnected)
             {
                 _isRelayConnected = true;
-                EventsManager.Instance.Notify(EventID.OnCheckGameplayState, _joinedLobby);
+                EventsManager.Notify(EventID.OnCheckGameplayState, _joinedLobby);
                 //RelayManager.Instance.JoinRelay(_joinedLobby.Data[KEY_RELAY_CODE].Value);
                 //Debug.Log("Join Relay when lobby changes: ");
             }
@@ -362,12 +396,21 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         NotificationParam param = new NotificationParam(content, TweenSwitchScene);
         UIManager.Instance.HideAllCurrentPopups();
         UIManager.Instance.TogglePopup(EPopupID.PopupInformation, true);
-        EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
+        EventsManager.Notify(EventID.OnReceiveNotiParam, param);
     }
 
     private void TweenSwitchScene()
     {
-        EventsManager.Instance.Notify(EventID.OnStartGame, _joinedLobby);
+        UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false);
+        object[] objs = new object[] { _joinedLobby, null };
+        EventsManager.Notify(EventID.OnStartGame, objs);
+    }
+
+    private void TweenSwitchScene2(string lobbyId)
+    {
+        UIManager.Instance.TogglePopup(EPopupID.PopupLobby, false);
+        object[] objs = new object[] { _joinedLobby, _prevLobbyId == lobbyId && !String.IsNullOrEmpty(lobbyId) };
+        EventsManager.Notify(EventID.OnStartGame, objs);
     }
 
     public void CreateALobby(string lobbyName, int maxPlayers, int numOfRounds, int timeLimit, int timePrep)
@@ -375,50 +418,14 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         CreateLobby(lobbyName, maxPlayers, numOfRounds, timeLimit, timePrep);
     }
 
-    public void ListLobby()
-    {
-        ListLobbies();
-    }
-
     public void JoinALobby(string lobbyID)
     {
         JoinLobbyByID(lobbyID);
     }
 
-    private async void ListLobbies()
-    {
-        try
-        {
-            QueryLobbiesOptions queryLobbiesOptions = new QueryLobbiesOptions
-            {
-                Count = 25,
-                Filters = new List<QueryFilter>
-                {
-                    new QueryFilter(QueryFilter.FieldOptions.AvailableSlots,
-                    "0",
-                    QueryFilter.OpOptions.GT)
-                },
-                Order = new List<QueryOrder>
-                {
-                    new QueryOrder(false, QueryOrder.FieldOptions.Created)
-                }
-            };
-
-            //để tham số default thì lấy mọi lobby
-            QueryResponse queryResponse = await Lobbies.Instance.QueryLobbiesAsync(queryLobbiesOptions);
-
-            Debug.Log("Lobbies found: " + queryResponse.Results.Count + ", " + queryResponse.Results[0].Players.Count);
-            foreach (var result in queryResponse.Results)
-                Debug.Log("Lobby: " + result.Name + ", " + result.MaxPlayers);
-        }
-        catch (LobbyServiceException ex)
-        {
-            Debug.Log(ex);
-        }
-    }
-
     private async void JoinLobbyByID(string lobbyID)
     {
+         
         try
         {
             QueryResponse queryResponse = await Lobbies.Instance.QueryLobbiesAsync();
@@ -436,11 +443,14 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
                 }
             };
 
-            Lobby lobby = await Lobbies.Instance.JoinLobbyByIdAsync(lobbyID, options);//JoinLobbyByIDAsync(cleanedLobbyCode);
+            Lobby lobby = await Lobbies.Instance.JoinLobbyByIdAsync(lobbyID, options);
             _joinedLobby = lobby;
             RelayManager.Instance.JoinRelay(_joinedLobby.Data[KEY_RELAY_CODE].Value);
 
-            TweenSwitchScene();
+            TweenSwitchScene2(lobbyID);
+            if (String.IsNullOrEmpty(_prevLobbyId))
+                _prevLobbyId = lobbyID;
+            //TweenSwitchScene();
         }
         catch (LobbyServiceException ex)
         {
@@ -477,9 +487,100 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
 
             QueryResponse response = await Lobbies.Instance.QueryLobbiesAsync();//options);
 
-            EventsManager.Instance.Notify(EventID.OnRefreshLobby, response.Results);
+            EventsManager.Notify(EventID.OnRefreshLobby, response.Results);
         }
         catch (LobbyServiceException ex)
+        {
+            Debug.Log(ex);
+        }
+    }
+
+    public void LeaveALobby()
+    {
+        LeaveLobby();
+    }
+
+    //có thể chia leave ra 2 loại:
+    //1. client leave -> remove client đó và client đó tự shutdown (done)
+    //2. host leave -> remove tất cả client và host tự shutdown và delete lobby (khi end game)
+    //3. host leave giữa game -> thực hiện host migration, game vẫn tiếp tục (để sau)
+    private async void LeaveLobby()
+    {
+        try
+        {
+            if (IsHost)
+            {
+                Debug.Log("host migrating");
+                MigrateLobbyHost();
+                if (IsOwner)
+                    RemovePlayerServerRpc(_pData);
+            }
+            else if (IsOwner)
+                RemovePlayerServerRpc(_pData);
+
+            await LobbyService.Instance.RemovePlayerAsync(_joinedLobby.Id, AuthenticationService.Instance.PlayerId);
+            //NetworkManager.Singleton.Shutdown();
+            _hostLobby = _joinedLobby = null;
+            Debug.Log("client leave lobby success");
+        }
+        catch (LobbyServiceException ex)
+        {
+            Debug.Log(ex);
+        }
+    }
+
+    private async void HandleEndMatch(object obj)
+    {
+        //lúc bấm return ở end match
+        if (NetworkManager.Singleton.IsHost)
+        {
+            try
+            {
+                await Lobbies.Instance.DeleteLobbyAsync(_joinedLobby.Id);
+                _listPlayers.Clear();
+                ReturnMenuClientRpc();
+                NetworkManager.Singleton.Shutdown();
+                //DontDestroyOnLoad(gameObject);
+                Debug.Log("Host delete lobby & leave");
+            }
+            catch (LobbyServiceException ex)
+            {
+                Debug.Log(ex);
+            }
+        }
+        else
+            LeaveALobby();
+    }
+
+    [ClientRpc]
+    private void MigrateHostClientRpc(string allocateId)
+    {
+        // Kiểm tra xem allocateId có khớp với allocateId của host mới không
+        if (allocateId != NetworkManager.Singleton.LocalClientId.ToString())
+        {
+            // Làm gì đó khi client không phải là host mới (ví dụ: thông báo thay đổi host)
+            Debug.Log("Host has been migrated to: " + allocateId);
+        }
+        else
+        {
+            NetworkManager.Singleton.StartHost();
+            // Làm gì đó nếu client hiện tại là host mới (ví dụ: kích hoạt các hành động host)
+            Debug.Log("You are now the host!");
+        }
+    }
+
+    private async void MigrateLobbyHost()
+    {
+        try
+        {
+            _hostLobby = await Lobbies.Instance.UpdateLobbyAsync(_joinedLobby.Id, new UpdateLobbyOptions
+            {
+                HostId = _joinedLobby.Players[1].Id
+            });
+            _joinedLobby = _hostLobby;
+            MigrateHostClientRpc(_joinedLobby.Players[1].AllocationId);
+        }
+        catch(LobbyServiceException ex)
         {
             Debug.Log(ex);
         }
@@ -495,7 +596,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         {
             string content = "The name " + playerName + " is already exist in Lobby, choose another name!";
             NotificationParam param = new NotificationParam(content, () => { UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false); });
-            EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
+            EventsManager.Notify(EventID.OnReceiveNotiParam, param);
             return;
         }
 
@@ -515,13 +616,13 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
             {
                 /*string successMessage = "Your name has been updated successfully!";
                 NotificationParam successParam = new NotificationParam(successMessage, () => { UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false); });
-                EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, successParam);*/
+                EventsManager.Notify(EventID.OnReceiveNotiParam, successParam);*/
 
                 _pData = new PlayerData(playerName, DEFAULT_SCORE);
 
                 //tạo đc tên thì bắn event cho chơi
                 //kèm data người chơi này
-                //EventsManager.Instance.Notify(EventID.OnCanPlay, pData);
+                //EventsManager.Notify(EventID.OnCanPlay, pData);
                 UIManager.Instance.TogglePopup(EPopupID.PopupEnterName, false);
                 string content = "Waiting for other players...";
                 ShowNotification.Show(content);
@@ -563,7 +664,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
             string content = "Not enough score to buy";
             NotificationParam param = new NotificationParam(content, () => { });
             UIManager.Instance.TogglePopup(EPopupID.PopupInformation, true);
-            EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
+            EventsManager.Notify(EventID.OnReceiveNotiParam, param);
             ShowNotification.Show(content);
         }
     }

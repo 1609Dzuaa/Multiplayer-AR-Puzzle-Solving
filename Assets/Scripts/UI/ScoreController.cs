@@ -17,17 +17,32 @@ public class ScoreController : MonoBehaviour
     private void Awake()
     {
         _txtScore = GetComponent<TextMeshProUGUI>();
-        EventsManager.Instance.Subscribe(EventID.OnTrackedImageSuccess, AddScore);
-        EventsManager.Instance.Subscribe(EventID.OnCanPlay, ReceivePlayerData);
-        EventsManager.Instance.Subscribe(EventID.OnNotifyWinner1, SendDataToHost);
-        Debug.Log("Score sub");
+        EventsManager.Subscribe(EventID.OnTrackedImageSuccess, AddScore);
+        EventsManager.Subscribe(EventID.OnCanPlay, ReceivePlayerData);
+        EventsManager.Subscribe(EventID.OnNotifyWinner1, SendDataToHost);
+        EventsManager.Subscribe(EventID.OnPurchaseSuccess, SubtractScore);
     }
 
     private void OnDestroy()
     {
-        EventsManager.Instance.Unsubscribe(EventID.OnTrackedImageSuccess, AddScore);
-        EventsManager.Instance.Unsubscribe(EventID.OnCanPlay, ReceivePlayerData);
-        EventsManager.Instance.Unsubscribe(EventID.OnNotifyWinner1, SendDataToHost);
+        EventsManager.Unsubscribe(EventID.OnTrackedImageSuccess, AddScore);
+        EventsManager.Unsubscribe(EventID.OnCanPlay, ReceivePlayerData);
+        EventsManager.Unsubscribe(EventID.OnNotifyWinner1, SendDataToHost);
+        EventsManager.Unsubscribe(EventID.OnPurchaseSuccess, SubtractScore);
+    }
+
+    private void SubtractScore(object obj)
+    {
+        int scoreSubtracted = (int)obj;
+        DOTween.To(() => _score, x => _score = x, _score - scoreSubtracted, _duration).OnUpdate(
+         () => _txtScore.text = "Score: " + _score.ToString()).OnComplete(
+         () =>
+         {
+             _pData.Score = _score;
+             //bắn event kêu host update data
+             EventsManager.Notify(EventID.OnUpdatePlayerData, _pData);
+             Debug.Log("done subtract score");
+         });
     }
 
     private void AddScore(object obj)
@@ -42,7 +57,7 @@ public class ScoreController : MonoBehaviour
         if (PowerupManager.Instance.Stake)
             scoreReceived += PowerupManager.Instance.ScoreStakeIncrease;
 
-        if (RoundManager.Instance.IsBombed.Value)
+        if (RoundManager.Instance.IsBombed.Value && !PowerupManager.Instance.Shield)
             scoreReceived = 0;
             
         DOTween.To(() => _score, x => _score = x, _score + scoreReceived, _duration).OnUpdate(
@@ -51,7 +66,7 @@ public class ScoreController : MonoBehaviour
             {
                 _pData.Score = _score;
                 //bắn event kêu host update data
-                EventsManager.Instance.Notify(EventID.OnUpdatePlayerData, _pData);
+                EventsManager.Notify(EventID.OnUpdatePlayerData, _pData);
                 //Debug.Log("done tween score");
             });
     }
@@ -66,6 +81,6 @@ public class ScoreController : MonoBehaviour
     private void SendDataToHost(object obj)
     {
         Debug.Log("send data to host");
-        EventsManager.Instance.Notify(EventID.OnNotifyWinner2, _pData);
+        EventsManager.Notify(EventID.OnNotifyWinner2, _pData);
     }
 }

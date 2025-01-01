@@ -19,7 +19,7 @@ public class LobbyController : MonoBehaviour
 
     private void Awake()
     {
-        EventsManager.Instance.Subscribe(EventID.OnRefreshLobby, RefreshLobbyList);
+        EventsManager.Subscribe(EventID.OnRefreshLobby, RefreshLobbyList);
     }
 
     private void OnEnable()
@@ -35,7 +35,7 @@ public class LobbyController : MonoBehaviour
     private void OnDestroy()
     {
         //base.OnDestroy();
-        EventsManager.Instance.Unsubscribe(EventID.OnRefreshLobby, RefreshLobbyList);
+        EventsManager.Unsubscribe(EventID.OnRefreshLobby, RefreshLobbyList);
     }
 
     private void Update()

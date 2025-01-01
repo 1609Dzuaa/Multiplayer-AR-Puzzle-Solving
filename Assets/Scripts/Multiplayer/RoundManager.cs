@@ -113,12 +113,12 @@ public class RoundManager : NetworkSingleton<RoundManager>
     private void ResetNewRoundClientRpc(int currentRound = 1)
     {
         //NumsOfObjTrackedCurrentRound.Value = DEFAULT_MAX_OBJECT_TRACKED;
-        EventsManager.Instance.Notify(EventID.OnReceiveQuest, currentRound);
+        EventsManager.Notify(EventID.OnReceiveQuest, currentRound);
         QuestManager.Instance.IsRestRound = false;
         _isRestRound = false;
         UIManager.Instance.ToggleButtonShop(false);
         string content = "Start round " + CountRound.Value + "!";
-        ShowNotification.Show(content, () => { });
+        ShowNotification.Show(content, () => UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false));
     }
 
     [ClientRpc]
@@ -132,20 +132,20 @@ public class RoundManager : NetworkSingleton<RoundManager>
     {
         _txtRound.text = "Rest Round";
         string content = "End of round " + CountRound.Value +", head to the Shop and buy some Power-ups";
-        ShowNotification.Show(content, () => { });
+        ShowNotification.Show(content, () => UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false));
         UIManager.Instance.ToggleButtonShop(true);
         QuestManager.Instance.IsRestRound = true;
         if (PowerupManager.Instance.Stake && !PowerupManager.Instance.HintSolved)
         {
             Debug.Log("At rest round but hasn't finished solved question!");
-            EventsManager.Instance.Notify(EventID.OnStakeDecrease);
+            EventsManager.Notify(EventID.OnStakeDecrease);
         }
     }
 
     [ClientRpc]
     private void NotifyWinnerClientRpc()
     {
-        EventsManager.Instance.Notify(EventID.OnNotifyWinner1);
+        EventsManager.Notify(EventID.OnNotifyWinner1);
     }
 
     #endregion

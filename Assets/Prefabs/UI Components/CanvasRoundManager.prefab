@@ -62,7 +62,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 25
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 1
+  m_SortingOrder: -1
   m_TargetDisplay: 0
 --- !u!114 &1583831570945185696
 MonoBehaviour:
@@ -151,6 +151,8 @@ MonoBehaviour:
   CountTime:
     m_InternalValue: 0
   NumsOfObjTrackedCurrentRound:
+    m_InternalValue: 0
+  IsBombed:
     m_InternalValue: 0
 --- !u!1 &381557221783179445
 GameObject:

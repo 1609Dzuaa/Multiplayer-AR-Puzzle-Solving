@@ -12,7 +12,7 @@ public class RewardController : HintController
 
     private void Awake()
     {
-        EventsManager.Instance.Subscribe(EventID.OnTrackedImageSuccess, ReceiveData);
+        EventsManager.Subscribe(EventID.OnTrackedImageSuccess, ReceiveData);
     }
 
     private void Start()
@@ -22,7 +22,7 @@ public class RewardController : HintController
 
     private void OnDestroy()
     {
-        EventsManager.Instance.Unsubscribe(EventID.OnTrackedImageSuccess, ReceiveData);
+        EventsManager.Unsubscribe(EventID.OnTrackedImageSuccess, ReceiveData);
     }
 
     private void ReceiveData(object obj)
@@ -39,7 +39,8 @@ public class RewardController : HintController
         //Debug.Log("isbomb: " + RoundManager.Instance.IsBombed.Value);
         if (RoundManager.Instance.IsBombed.Value)
         {
-            scoreReceived = 0;
+            if (!PowerupManager.Instance.Shield)
+                scoreReceived = 0;
             if (RoundManager.Instance.IsHost)
                 RoundManager.Instance.HandleBombServerRpc(false);
             else if (RoundManager.Instance.IsOwner)

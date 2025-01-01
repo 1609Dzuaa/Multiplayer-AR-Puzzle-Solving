@@ -20,7 +20,7 @@ public class ChestInteraction : NetworkBehaviour
 
     private void Awake()
     {
-        EventsManager.Instance.Subscribe(EventID.OnReceiveQuestInfo, ReceiveQuestInfo);
+        EventsManager.Subscribe(EventID.OnReceiveQuestInfo, ReceiveQuestInfo);
         //_listFastestPlayers = new NetworkList<ulong>();
     }
 
@@ -33,7 +33,7 @@ public class ChestInteraction : NetworkBehaviour
     public override void OnDestroy()
     {
         base.OnDestroy();
-        EventsManager.Instance.Unsubscribe(EventID.OnReceiveQuestInfo, ReceiveQuestInfo);
+        EventsManager.Unsubscribe(EventID.OnReceiveQuestInfo, ReceiveQuestInfo);
     }
     private void ReceiveQuestInfo(object obj)
     {
@@ -98,7 +98,7 @@ public class ChestInteraction : NetworkBehaviour
         //QuestManager.Instance.RemoveQuest();
         if (PowerupManager.Instance.Stake)
             PowerupManager.Instance.HintSolved = true;
-        EventsManager.Instance.Notify(EventID.OnTrackedImageSuccess, _questInfo);
+        EventsManager.Notify(EventID.OnTrackedImageSuccess, _questInfo);
         UIManager.Instance.TogglePopup(EPopupID.PopupReward, true);
         if (RoundManager.Instance.IsHost)
         {

@@ -18,16 +18,16 @@ public class HintController : PopupController
 
     private void Awake()
     {
-        EventsManager.Instance.Subscribe(EventID.OnReceiveQuest, GetNextQuest);
-        //EventsManager.Instance.Subscribe(EventID.OnTrackedImageSuccess, GetNextQuest);
+        EventsManager.Subscribe(EventID.OnReceiveQuest, GetNextQuest);
+        //EventsManager.Subscribe(EventID.OnTrackedImageSuccess, GetNextQuest);
         //_currentQuest = QuestManager.Instance.GetNextQuest();
         //_txtHint.text = (_currentQuest != null) ? _currentQuest.Hint : "No Hint Left";
     }
 
     private void OnDestroy()
     {
-        EventsManager.Instance.Unsubscribe(EventID.OnReceiveQuest, GetNextQuest);
-        //EventsManager.Instance.Unsubscribe(EventID.OnTrackedImageSuccess, GetNextQuest);
+        EventsManager.Unsubscribe(EventID.OnReceiveQuest, GetNextQuest);
+        //EventsManager.Unsubscribe(EventID.OnTrackedImageSuccess, GetNextQuest);
     }
 
     private void GetNextQuest(object obj = null)
@@ -81,7 +81,7 @@ public class HintController : PopupController
         //bấm vào thì text sang hint kế, bấm lại thì sang hint trước
         /*string content = "Do You Want Next Hint ?";
         NotificationParam param = new NotificationParam(content);
-        EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
+        EventsManager.Notify(EventID.OnReceiveNotiParam, param);
         UIManager.Instance.TogglePopup(EPopupID.PopupInformation, true);*/
     }
 

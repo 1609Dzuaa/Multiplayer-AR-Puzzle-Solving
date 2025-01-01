@@ -22,7 +22,7 @@ public class GameManager : NetworkSingleton<GameManager>
     public override void OnDestroy()
     {
         base.OnDestroy();
-        //EventsManager.Instance.Unsubscribe(EventID.OnCanPlay, CreateListPlayers);
+        //EventsManager.Unsubscribe(EventID.OnCanPlay, CreateListPlayers);
         //_listPlayers.OnListChanged -= OnListPlayersChanged;
     }
 }

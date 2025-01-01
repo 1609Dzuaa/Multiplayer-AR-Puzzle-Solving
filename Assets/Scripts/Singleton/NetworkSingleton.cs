@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class NetworkSingleton<T> : NetworkBehaviour where T : NetworkBehaviour
 {
-    private static T _instance;
+    protected static T _instance;
 
     public static T Instance
     {
@@ -38,13 +38,5 @@ public class NetworkSingleton<T> : NetworkBehaviour where T : NetworkBehaviour
     protected virtual void Awake()
     {
         CreateInstance();
-    }
-
-    public override void OnDestroy()
-    {
-        if (_instance == this)
-        {
-            _instance = null;
-        }
     }
 }

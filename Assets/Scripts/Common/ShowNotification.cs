@@ -9,7 +9,7 @@ public static class ShowNotification
     public static void Show(string content, UnityAction continueCallback = null)
     {
         NotificationParam param = new NotificationParam(content, continueCallback);
-        EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
+        EventsManager.Notify(EventID.OnReceiveNotiParam, param);
         UIManager.Instance.TogglePopup(EPopupID.PopupInformation, true);
     }
 }

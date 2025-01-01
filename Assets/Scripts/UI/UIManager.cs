@@ -28,7 +28,7 @@ public class UIManager : BaseSingleton<UIManager>
     [SerializeField] Transform _mainContent;
     [SerializeField] float _distance;
     [SerializeField] float _duration;
-    [SerializeField] GameObject _btnShop;
+    [SerializeField] GameObject _btnShop, _iconPowerups;
 
     [Header("Các main component của AR system, mới vào thì giấu nó đi để tránh bug")]
     [SerializeField] Transform[] _arrARComponents; //đừng active component "UI" trước các component khác
@@ -53,18 +53,19 @@ public class UIManager : BaseSingleton<UIManager>
         UIManager.Instance.Setting.SetActive(false);
         UIManager.Instance.About.SetActive(false);
         _btnShop.SetActive(false);
-        /*EventsManager.Instance.Subscribe(EventID.OnLogoTweenCompleted, TweenButtons);
-        EventsManager.Instance.Subscribe(EventID.OnStartGame, StartGame);
-        EventsManager.Instance.Subscribe(EventID.OnCheckGameplayState, CheckGameplayState);*/
+        /*EventsManager.Subscribe(EventID.OnLogoTweenCompleted, TweenButtons);
+        EventsManager.Subscribe(EventID.OnStartGame, StartGame);
+        EventsManager.Subscribe(EventID.OnCheckGameplayState, CheckGameplayState);*/
         //Debug.Log($"Server IP: {NetworkManager.Singleton.ConnectedClients[NetworkManager.Singleton.LocalClientId].ClientId}");
     }
 
     private void Start()
     {
-        EventsManager.Instance.Subscribe(EventID.OnLogoTweenCompleted, TweenButtons);
-        EventsManager.Instance.Subscribe(EventID.OnStartGame, StartGame);
-        EventsManager.Instance.Subscribe(EventID.OnCheckGameplayState, CheckGameplayState);
-        EventsManager.Instance.Subscribe(EventID.OnCanPlay, AllowToPlay);
+        EventsManager.Subscribe(EventID.OnLogoTweenCompleted, TweenButtons);
+        EventsManager.Subscribe(EventID.OnStartGame, StartGame);
+        EventsManager.Subscribe(EventID.OnCheckGameplayState, CheckGameplayState);
+        EventsManager.Subscribe(EventID.OnCanPlay, AllowToPlay);
+        EventsManager.Subscribe(EventID.OnReturnMenu, ReturnMenu);
 
         for (int i = 0; i < _arrARComponents.Length; i++)
             _arrARComponents[i].gameObject.SetActive(false);
@@ -83,10 +84,11 @@ public class UIManager : BaseSingleton<UIManager>
 
     private void OnDestroy()
     {
-        EventsManager.Instance.Unsubscribe(EventID.OnLogoTweenCompleted, TweenButtons);
-        EventsManager.Instance.Unsubscribe(EventID.OnStartGame, StartGame);
-        EventsManager.Instance.Unsubscribe(EventID.OnCheckGameplayState, CheckGameplayState);
-        EventsManager.Instance.Unsubscribe(EventID.OnCanPlay, AllowToPlay);
+        EventsManager.Unsubscribe(EventID.OnLogoTweenCompleted, TweenButtons);
+        EventsManager.Unsubscribe(EventID.OnStartGame, StartGame);
+        EventsManager.Unsubscribe(EventID.OnCheckGameplayState, CheckGameplayState);
+        EventsManager.Unsubscribe(EventID.OnCanPlay, AllowToPlay);
+        EventsManager.Unsubscribe(EventID.OnReturnMenu, ReturnMenu);
     }
 
     private void TweenButtons(object obj = null)
@@ -96,29 +98,58 @@ public class UIManager : BaseSingleton<UIManager>
 
     private void StartGame(object obj)
     {
-        Lobby joinedLobby = (Lobby)obj;
+        object[] objs = (object[])obj;
+        Lobby joinedLobby = (Lobby)objs[0];
+        bool isRejoin = false;
+        if (objs[1] != null)
+            isRejoin = (bool)objs[1];
 
+        TweenSwitchScene(false, joinedLobby, isRejoin);
+    }
+
+    private void ReturnMenu(object obj)
+    {
+        _iconPowerups.SetActive(false);
+        TogglePopup(EPopupID.PopupWinner, false);
+        TweenSwitchScene(true);
+    }
+
+    private void TweenSwitchScene(bool backToMenu, Lobby joinedLobby = null, bool isRejoin = false)
+    {
         float targetPos = _initPos.x + _distance;
 
         _sceneTrans.DOLocalMoveX(targetPos, _duration).OnComplete(() =>
         {
-
+            //Debug.Log("back: " + backToMenu);
             for (int i = 0; i < _arrMainMenuComponents.Length; i++)
-                _arrMainMenuComponents[i].gameObject.SetActive(false);
+                _arrMainMenuComponents[i].gameObject.SetActive((!backToMenu) ? false : true);
 
             HideAllCurrentPopups();
+
+            if (backToMenu)
+            {
+                for (int i = 0; i < _arrARComponents.Length; i++)
+                    _arrARComponents[i].gameObject.SetActive(false);
+                _dimmedBG.gameObject.SetActive(false);
+                //SceneManager.LoadScene(0);
+            }
 
             _sceneTrans.DOLocalMoveX(targetPos + _distance, _duration).OnComplete(() =>
             {
                 _sceneTrans.localPosition = _initPos;
+                /*if (!backToMenu)
+                {
+                    for (int i = 0; i < _arrARComponents.Length; i++)
+                        _arrARComponents[i].gameObject.SetActive(true);
+                }*/
                 //thằng nào cũng phải truyền cái lobby nó join vào để check
                 if (joinedLobby != null)
                 {
-                    CheckGameplayState(joinedLobby);
-                    //Debug.Log("Check trong Start");
+                    if (!isRejoin)
+                        CheckGameplayState(joinedLobby);
+                    else
+                        Debug.Log("rejoin");
                 }
-                //else
-                    //Debug.Log("Lobby null 0 check");
             });
         });
     }
@@ -165,6 +196,7 @@ public class UIManager : BaseSingleton<UIManager>
             _arrARComponents[i].gameObject.SetActive(true);
 
         TogglePopup(EPopupID.PopupInformation, false);
+        _dimmedBG.gameObject.SetActive(false);
         _canPlay = true;
         //Debug.Log("stack: " + _stackPopupOrder.Count);
         //if (_stackPopupOrder.Count > 0)
@@ -176,7 +208,7 @@ public class UIManager : BaseSingleton<UIManager>
         string content = "Waiting for other players, current: " + lobby.Players.Count + "/" + lobby.MaxPlayers;
         NotificationParam param = new NotificationParam(content);
         TogglePopup(EPopupID.PopupInformation, true);
-        EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
+        EventsManager.Notify(EventID.OnReceiveNotiParam, param);
     }
 
     public void TogglePopup(EPopupID id, bool On)

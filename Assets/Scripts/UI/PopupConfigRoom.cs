@@ -49,7 +49,6 @@ public class PopupConfigRoom : PopupController
                 break;
 
             case 2:
-                LobbyManager.Instance.ListLobby();
                 break;
         }
     }

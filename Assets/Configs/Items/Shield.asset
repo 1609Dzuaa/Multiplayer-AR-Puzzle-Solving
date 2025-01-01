@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PowerupName: Shield
   PowerupIcon: {fileID: 21300000, guid: 31f3a12990e62ce478cf4f3fbc497c02, type: 3}
-  Price: 30
+  Price: 10
   Description: Protect you from 1 sabotage effect, last for 2 rounds.

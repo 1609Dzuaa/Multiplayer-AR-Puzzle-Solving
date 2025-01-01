@@ -21,6 +21,9 @@ public static class GameEnums
         OnNotifyWinner2, //từ score gửi data lên host
         OnPopupWinner,
         OnStakeDecrease,
+        OnReturnMenu, //out lobby || end match
+        OnPurchaseSuccess, //trừ tiền
+        OnEndMatch, //event để xác định có phải host out để delete lobby
 
     }
 
@@ -36,6 +39,7 @@ public static class GameEnums
         PopupConfigRoom = 7,
         PopupShop = 8,
         PopupEnterName = 9,
+        PopupWinner = 10,
 
     }
 

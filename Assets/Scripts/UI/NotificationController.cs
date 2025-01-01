@@ -31,7 +31,7 @@ public class NotificationController : HintController
 
     private void Awake()
     {
-        EventsManager.Instance.Subscribe(EventID.OnReceiveNotiParam, ReceiveParam);
+        EventsManager.Subscribe(EventID.OnReceiveNotiParam, ReceiveParam);
         _arrCallbacks = new UnityAction[3];
     }
 
@@ -42,7 +42,7 @@ public class NotificationController : HintController
 
     private void OnDestroy()
     {
-        EventsManager.Instance.Unsubscribe(EventID.OnReceiveNotiParam, ReceiveParam);
+        EventsManager.Unsubscribe(EventID.OnReceiveNotiParam, ReceiveParam);
     }
 
     private void ReceiveParam(object obj)

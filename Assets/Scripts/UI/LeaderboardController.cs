@@ -12,12 +12,12 @@ public class LeaderboardController : PopupController
 
     private void Awake()
     {
-        EventsManager.Instance.Subscribe(EventID.OnRefreshLeaderboard, RefreshLeaderboard);
+        EventsManager.Subscribe(EventID.OnRefreshLeaderboard, RefreshLeaderboard);
     }
 
     private void OnDestroy()
     {
-        EventsManager.Instance.Unsubscribe(EventID.OnRefreshLeaderboard, RefreshLeaderboard);
+        EventsManager.Unsubscribe(EventID.OnRefreshLeaderboard, RefreshLeaderboard);
     }
 
     public void ButtonCloseClick()

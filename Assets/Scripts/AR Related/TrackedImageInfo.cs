@@ -16,7 +16,7 @@ public class TrackedImageInfo : MonoBehaviour
     private void Awake()
     {
         _trackedImageManager = GetComponent<ARTrackedImageManager>();
-        EventsManager.Instance.Subscribe(EventID.OnTrackedImageSuccess, RemovePrefab);
+        EventsManager.Subscribe(EventID.OnTrackedImageSuccess, RemovePrefab);
 
         foreach (var prefab in _placeablePrefabs)
         {
@@ -30,7 +30,7 @@ public class TrackedImageInfo : MonoBehaviour
 
     private void OnDestroy()
     {
-        EventsManager.Instance.Unsubscribe(EventID.OnTrackedImageSuccess, RemovePrefab);
+        EventsManager.Unsubscribe(EventID.OnTrackedImageSuccess, RemovePrefab);
     }
 
     private void RemovePrefab(object obj)
@@ -89,7 +89,7 @@ public class TrackedImageInfo : MonoBehaviour
                 prefab.SetActive(QuestManager.Instance.IsRestRound ? false : true);
 
                 if (!quest) Debug.Log("Question of image: " + name + " get null");
-                else EventsManager.Instance.Notify(EventID.OnReceiveQuestInfo, quest);
+                else EventsManager.Notify(EventID.OnReceiveQuestInfo, quest);
 
                 //Debug.Log("active true: " + prefab);
 

@@ -25,6 +25,6 @@ public class ItemRoomController : MonoBehaviour
     {
         LobbyManager.Instance.JoinALobby(_lobby.Id);
         //UIManager.Instance.TogglePopup(EPopupID.PopupEnterCode, true);
-        //EventsManager.Instance.Notify(EventID.OnRefreshLobby, _lobby);
+        //EventsManager.Notify(EventID.OnRefreshLobby, _lobby);
     }
 }

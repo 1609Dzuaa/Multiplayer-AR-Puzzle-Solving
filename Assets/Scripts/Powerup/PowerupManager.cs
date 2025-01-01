@@ -11,20 +11,21 @@ public class PowerupManager : BaseSingleton<PowerupManager>
     [SerializeField] Button _bombIcon;
     [HideInInspector] public bool DoubleScore = false;
     [HideInInspector] public bool Stake = false, HintSolved;
+    [HideInInspector] public bool Shield = false;
     public int ScoreStakeIncrease, ScoreStakeDecrease;
     bool _bombed;
 
     protected override void Awake()
     {
         base.Awake();
-        EventsManager.Instance.Subscribe(EventID.OnTrackedImageSuccess, AllowSetBomb);
+        EventsManager.Subscribe(EventID.OnTrackedImageSuccess, AllowSetBomb);
     }
 
     private void AllowSetBomb(object obj) => _bombIcon.interactable = true;
 
     private void OnDestroy()
     {
-        EventsManager.Instance.Unsubscribe(EventID.OnTrackedImageSuccess, AllowSetBomb);
+        EventsManager.Unsubscribe(EventID.OnTrackedImageSuccess, AllowSetBomb);
     }
 
     // Start is called before the first frame update
@@ -35,6 +36,7 @@ public class PowerupManager : BaseSingleton<PowerupManager>
 
     public void HandlePurchasePowerup(Powerup powerup)
     {
+        EventsManager.Notify(EventID.OnPurchaseSuccess, powerup.Price);
         switch(powerup.PowerupName)
         {
             case DOUBLE_SCORE:
@@ -48,14 +50,16 @@ public class PowerupManager : BaseSingleton<PowerupManager>
                 gameObject.SetActive(true);
                 break;
             case SHIELD:
+                Shield = true;
                 _shieldIcon.gameObject.SetActive(true);
                 gameObject.SetActive(true);
-                break;
+                break;           
         }
         string content = "Purchase success!";
         ShowNotification.Show(content, () => UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false));
     }
 
+    //sau 1 round thì reset powerup
     public void ResetPowerups()
     {
         DoubleScore = false;
@@ -65,6 +69,7 @@ public class PowerupManager : BaseSingleton<PowerupManager>
         gameObject.SetActive(false);
         _bombed = false;
         _bombIcon.GetComponent<Image>().color = new Color(1f, 1f, 1f, 1f);
+        Shield = false;
     }
 
     public void SetBomb()
@@ -84,7 +89,7 @@ public class PowerupManager : BaseSingleton<PowerupManager>
             string content = "Set bomb success!";
             NotificationParam param = new NotificationParam(content, () => UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false));
             UIManager.Instance.TogglePopup(EPopupID.PopupInformation, true);
-            EventsManager.Instance.Notify(EventID.OnReceiveNotiParam, param);
+            EventsManager.Notify(EventID.OnReceiveNotiParam, param);
         }
     }
 }

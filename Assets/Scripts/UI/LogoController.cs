@@ -22,7 +22,7 @@ public class LogoController : MonoBehaviour
 
         _imgLogo.DOFade(1.0f, _duration).OnComplete(() =>
         {
-            EventsManager.Instance.Notify(EventID.OnLogoTweenCompleted);
+            EventsManager.Notify(EventID.OnLogoTweenCompleted);
         });
     }
 }
