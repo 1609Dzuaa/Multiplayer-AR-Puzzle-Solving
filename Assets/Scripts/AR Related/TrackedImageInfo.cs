@@ -10,11 +10,12 @@ public class TrackedImageInfo : MonoBehaviour
 {
     [SerializeField] GameObject[] _placeablePrefabs;
 
-    Dictionary<string, GameObject> _dictSpawnPrefabs = new Dictionary<string, GameObject>();
+    Dictionary<string, GameObject> _dictSpawnPrefabs;
     ARTrackedImageManager _trackedImageManager;
 
     private void Awake()
     {
+        _dictSpawnPrefabs = new Dictionary<string, GameObject>();
         _trackedImageManager = GetComponent<ARTrackedImageManager>();
         EventsManager.Subscribe(EventID.OnTrackedImageSuccess, RemovePrefab);
 
@@ -24,7 +25,7 @@ public class TrackedImageInfo : MonoBehaviour
             newPrefab.name = prefab.name;
             _dictSpawnPrefabs.Add(prefab.name, newPrefab);
             newPrefab.SetActive(false);
-            //Debug.Log("name: " + prefab.name);
+            Debug.Log("name: " + prefab.name);
         }
     }
 
@@ -75,6 +76,8 @@ public class TrackedImageInfo : MonoBehaviour
         string name = trackImage.referenceImage.name;
         Vector3 position = trackImage.transform.position;
 
+        if (name == null)
+            Debug.Log("name null");
         if (_dictSpawnPrefabs.ContainsKey(name))
         {
             Question quest = QuestManager.Instance.ListQuest.Find(x => x.ImageName == name);

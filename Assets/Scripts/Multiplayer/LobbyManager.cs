@@ -373,7 +373,12 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     {
         if (changes.LobbyDeleted)
         {
-            
+            _hostLobby = _joinedLobby = null;
+            _listPlayers.Clear();
+            _isRelayConnected = _startCount = false;
+            _playerIndex = 0;
+            _prevLobbyId = "";
+            _heartBeatTimer = 0f;
         }
         else
         {
@@ -511,7 +516,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
             if (IsHost)
             {
                 Debug.Log("host migrating");
-                MigrateLobbyHost();
+                //MigrateLobbyHost();
                 if (IsOwner)
                     RemovePlayerServerRpc(_pData);
             }
@@ -553,13 +558,13 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     }
 
     [ClientRpc]
-    private void MigrateHostClientRpc(string allocateId)
+    private void MigrateHostClientRpc(string playerName)
     {
         // Kiểm tra xem allocateId có khớp với allocateId của host mới không
-        if (allocateId != NetworkManager.Singleton.LocalClientId.ToString())
+        if (playerName != _pData.Name)
         {
             // Làm gì đó khi client không phải là host mới (ví dụ: thông báo thay đổi host)
-            Debug.Log("Host has been migrated to: " + allocateId);
+            Debug.Log("Host has been migrated to: " + playerName);
         }
         else
         {
@@ -569,7 +574,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         }
     }
 
-    private async void MigrateLobbyHost()
+    /*private async void MigrateLobbyHost()
     {
         try
         {
@@ -578,13 +583,13 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
                 HostId = _joinedLobby.Players[1].Id
             });
             _joinedLobby = _hostLobby;
-            MigrateHostClientRpc(_joinedLobby.Players[1].AllocationId);
+            MigrateHostClientRpc(_listPlayers[1].Name.ToString());
         }
         catch(LobbyServiceException ex)
         {
             Debug.Log(ex);
         }
-    }
+    }*/
 
     public async void CreateNameInLobby(string playerName)
     {
