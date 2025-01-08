@@ -464,7 +464,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     [ClientRpc]
     void NotifyStartGameClientRpc(ulong clientId, LobbyInfo info)
     {
-        if (NetworkManager.Singleton.LocalClientId == clientId)
+        //if (NetworkManager.Singleton.LocalClientId == clientId)
         {
             Debug.Log("Notistart");
             EventsManager.Notify(EventID.OnStartGame, info);
