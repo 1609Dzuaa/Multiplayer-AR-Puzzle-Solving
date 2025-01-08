@@ -98,23 +98,19 @@ public class UIManager : BaseSingleton<UIManager>
 
     private void StartGame(object obj)
     {
-        object[] objs = (object[])obj;
-        Lobby joinedLobby = (Lobby)objs[0];
-        bool isRejoin = false;
-        if (objs[1] != null)
-            isRejoin = (bool)objs[1];
+        LobbyInfo info = (LobbyInfo)obj;
 
-        TweenSwitchScene(false, joinedLobby, isRejoin);
+        TweenSwitchScene(false, info);
     }
 
     private void ReturnMenu(object obj)
     {
         _iconPowerups.SetActive(false);
         TogglePopup(EPopupID.PopupWinner, false);
-        TweenSwitchScene(true);
+        TweenSwitchScene(true, new LobbyInfo(0, 0));
     }
 
-    private void TweenSwitchScene(bool backToMenu, Lobby joinedLobby = null, bool isRejoin = false)
+    private void TweenSwitchScene(bool backToMenu, LobbyInfo joinedLobby)
     {
         float targetPos = _initPos.x + _distance;
 
@@ -143,12 +139,9 @@ public class UIManager : BaseSingleton<UIManager>
                         _arrARComponents[i].gameObject.SetActive(true);
                 }*/
                 //thằng nào cũng phải truyền cái lobby nó join vào để check
-                if (joinedLobby != null)
+                if (!backToMenu)
                 {
-                    if (!isRejoin)
-                        CheckGameplayState(joinedLobby);
-                    else
-                        Debug.Log("rejoin");
+                    CheckGameplayState(joinedLobby);
                 }
             });
         });

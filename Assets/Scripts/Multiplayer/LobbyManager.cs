@@ -452,15 +452,21 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     private void TweenSwitchScene()
     {
         UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false);
-        object[] objs = new object[] { _joinedLobby, null };
-        EventsManager.Notify(EventID.OnStartGame, objs);
+        EventsManager.Notify(EventID.OnStartGame, _lobbyInfo);
     }
 
-    private void TweenSwitchScene2(string lobbyId)
+    [ServerRpc]
+    private void UpdateLobbyInfoServerRpc(LobbyInfo info)
+    {
+        info = _lobbyInfo;
+    }
+
+    //dc goi o client
+    private void TweenSwitchScene2()
     {
         UIManager.Instance.TogglePopup(EPopupID.PopupLobby, false);
-        object[] objs = new object[] { _joinedLobby, _prevLobbyId == lobbyId && !String.IsNullOrEmpty(lobbyId) };
-        EventsManager.Notify(EventID.OnStartGame, objs);
+        UpdateLobbyInfoServerRpc(_lobbyInfo);
+        EventsManager.Notify(EventID.OnStartGame, _lobbyInfo);
     }
 
     public void CreateALobby(string lobbyName, int maxPlayers, int numOfRounds, int timeLimit, int timePrep)
@@ -497,7 +503,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
             _joinedLobby = lobby;
             RelayManager.Instance.JoinRelay(_joinedLobby.Data[KEY_RELAY_CODE].Value);
 
-            TweenSwitchScene2(lobbyID);
+            TweenSwitchScene2();
             if (String.IsNullOrEmpty(_prevLobbyId))
                 _prevLobbyId = lobbyID;
             //TweenSwitchScene();
