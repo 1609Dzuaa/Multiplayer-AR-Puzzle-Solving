@@ -141,7 +141,8 @@ public class UIManager : BaseSingleton<UIManager>
                 //thằng nào cũng phải truyền cái lobby nó join vào để check
                 if (!backToMenu)
                 {
-                    CheckGameplayState(joinedLobby);
+                    if (joinedLobby.NumPlayerInLobby != 0)
+                        CheckGameplayState(joinedLobby);
                 }
             });
         });

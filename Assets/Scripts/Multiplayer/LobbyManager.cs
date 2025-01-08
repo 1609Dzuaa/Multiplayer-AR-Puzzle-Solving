@@ -456,17 +456,28 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     }
 
     [ServerRpc]
-    private void UpdateLobbyInfoServerRpc(LobbyInfo info)
+    private void UpdateLobbyInfoServerRpc(ulong clientId)
     {
-        info = _lobbyInfo;
+        NotifyStartGameClientRpc(clientId, _lobbyInfo);
+    }
+
+    [ClientRpc]
+    void NotifyStartGameClientRpc(ulong clientId, LobbyInfo info)
+    {
+        if (NetworkManager.Singleton.LocalClientId == clientId)
+        {
+            Debug.Log("Notistart");
+            EventsManager.Notify(EventID.OnStartGame, info);
+        }
     }
 
     //dc goi o client
     private void TweenSwitchScene2()
     {
         UIManager.Instance.TogglePopup(EPopupID.PopupLobby, false);
-        UpdateLobbyInfoServerRpc(_lobbyInfo);
-        EventsManager.Notify(EventID.OnStartGame, _lobbyInfo);
+        UpdateLobbyInfoServerRpc(NetworkManager.Singleton.LocalClientId);
+        Debug.Log("LobbyInfo after SvRpc: " + _lobbyInfo.NumPlayerInLobby);
+        //EventsManager.Notify(EventID.OnStartGame, _lobbyInfo);
     }
 
     public void CreateALobby(string lobbyName, int maxPlayers, int numOfRounds, int timeLimit, int timePrep)
