@@ -557,40 +557,6 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
             LeaveALobby();
     }
 
-    [ClientRpc]
-    private void MigrateHostClientRpc(string playerName)
-    {
-        // Kiểm tra xem allocateId có khớp với allocateId của host mới không
-        if (playerName != _pData.Name)
-        {
-            // Làm gì đó khi client không phải là host mới (ví dụ: thông báo thay đổi host)
-            Debug.Log("Host has been migrated to: " + playerName);
-        }
-        else
-        {
-            NetworkManager.Singleton.StartHost();
-            // Làm gì đó nếu client hiện tại là host mới (ví dụ: kích hoạt các hành động host)
-            Debug.Log("You are now the host!");
-        }
-    }
-
-    /*private async void MigrateLobbyHost()
-    {
-        try
-        {
-            _hostLobby = await Lobbies.Instance.UpdateLobbyAsync(_joinedLobby.Id, new UpdateLobbyOptions
-            {
-                HostId = _joinedLobby.Players[1].Id
-            });
-            _joinedLobby = _hostLobby;
-            MigrateHostClientRpc(_listPlayers[1].Name.ToString());
-        }
-        catch(LobbyServiceException ex)
-        {
-            Debug.Log(ex);
-        }
-    }*/
-
     public async void CreateNameInLobby(string playerName)
     {
         string keyName = AuthenticationService.Instance.PlayerId;

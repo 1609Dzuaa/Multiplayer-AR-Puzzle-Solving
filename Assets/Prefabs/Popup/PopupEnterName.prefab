@@ -401,6 +401,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _popupDuration: 0.35
   _popupEase: 24
+  _inputField: {fileID: 4657501927586194845}
   _txtName: {fileID: 8381690754409066496}
 --- !u!1 &5303305412816755846
 GameObject:

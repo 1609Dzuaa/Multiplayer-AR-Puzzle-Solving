@@ -371,10 +371,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _placeablePrefabs:
   - {fileID: 2884705084735435304, guid: 78eae56a9b0bec644be557db7f85145c, type: 3}
-  - {fileID: 2884705084735435304, guid: 62c98682cca467e4bb845fd4b96ae5bd, type: 3}
-  - {fileID: 2884705084735435304, guid: 501282e487cfa104f849a2476a59f1ac, type: 3}
-  - {fileID: 2884705084735435304, guid: c8b9e4d573111f047ae24bbf1c4be2e4, type: 3}
-  - {fileID: 2884705084735435304, guid: 6501efc796ba0074e8557741b5c649c5, type: 3}
+  - {fileID: 2147647474522964580, guid: 0c1ffc6615ffb334394841486a3ade3b, type: 3}
+  - {fileID: 8390241902166154026, guid: bfe469237b6b7fb4b81a9acdf8aedbde, type: 3}
+  - {fileID: 7784012661194530565, guid: 01c17eec7ac939240ac81f78eae21f4f, type: 3}
+  - {fileID: 4454980991020990177, guid: a6461ca0d0d0c1f4a901e18b04b121e0, type: 3}
 --- !u!1 &2512387470890420964
 GameObject:
   m_ObjectHideFlags: 0

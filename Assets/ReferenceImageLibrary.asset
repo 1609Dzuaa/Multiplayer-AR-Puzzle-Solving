@@ -35,7 +35,7 @@ MonoBehaviour:
       m_GuidHigh: 16104386210646127882
     m_Size: {x: 0.07504333, y: 0.07504333}
     m_SpecifySize: 1
-    m_Name: Chest_Orange 1
+    m_Name: Chest_Pink
     m_Texture: {fileID: 2800000, guid: 18080093229504840af54213ef457edf, type: 3}
   - m_SerializedGuid:
       m_GuidLow: 5539729025220808387
@@ -45,7 +45,7 @@ MonoBehaviour:
       m_GuidHigh: 288980859684963608
     m_Size: {x: 0.1, y: 0.1}
     m_SpecifySize: 1
-    m_Name: Chest_Orange 2
+    m_Name: Chest_Blue
     m_Texture: {fileID: 2800000, guid: ca21aa03100c917418c568908faa0204, type: 3}
   - m_SerializedGuid:
       m_GuidLow: 4661343084782583856
@@ -55,7 +55,7 @@ MonoBehaviour:
       m_GuidHigh: 3540770924517421242
     m_Size: {x: 0.1, y: 0.1}
     m_SpecifySize: 1
-    m_Name: Chest_Orange 3
+    m_Name: Chest_Green
     m_Texture: {fileID: 2800000, guid: b8e1f16ec3f88074ba70e46265582331, type: 3}
   - m_SerializedGuid:
       m_GuidLow: 4824847255967377130
@@ -65,5 +65,5 @@ MonoBehaviour:
       m_GuidHigh: 2951317045933102219
     m_Size: {x: 0.1, y: 0.1}
     m_SpecifySize: 1
-    m_Name: Chest_Orange 4
+    m_Name: Chest_Purple
     m_Texture: {fileID: 2800000, guid: a43e9f515aed30848bd4656e372ff528, type: 3}

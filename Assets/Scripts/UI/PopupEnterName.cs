@@ -5,11 +5,12 @@ using UnityEngine;
 
 public class PopupEnterName : PopupController
 {
-    [SerializeField] TextMeshProUGUI _txtName;
+    [SerializeField] TMP_InputField _inputField;
 
     public void OnConfirmClick()
     {
-        string inputName = _txtName.text.Replace("\u200B", "");
+        string inputName = _inputField.text.Replace("\u200B", "");
         LobbyManager.Instance.CreateNameInLobby(inputName);
+        _inputField.text = "";
     }
 }

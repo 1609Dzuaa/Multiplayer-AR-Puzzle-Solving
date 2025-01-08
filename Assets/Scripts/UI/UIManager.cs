@@ -227,7 +227,8 @@ public class UIManager : BaseSingleton<UIManager>
         else
         {
             _dictPopups[id].gameObject.GetComponent<PopupController>().TweenPopupOff(() => _dictPopups[id].SetActive(false));
-            _stackPopupOrder.Pop(); //bug client o day
+            if (_stackPopupOrder.Count > 0)
+                _stackPopupOrder.Pop(); //bug client o day
 
             //if (_stackPopupOrder.Count > 0)
                 //_stackPopupOrder.Peek().SetActive(true);

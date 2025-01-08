@@ -2,13 +2,12 @@
 using UnityEngine;
 using static GameEnums;
 
-public class ChestInteraction : NetworkBehaviour
+public class ChestInteraction : MonoBehaviour
 {
     [SerializeField] Transform _parent;
     [SerializeField] ParticleSystem _psConfetti;
     [SerializeField] ParticleSystem _psSparkle;
     [SerializeField] Transform _confettiPosition;
-    //NetworkList<ulong> _listFastestPlayers; //store id của 3 thằng nhanh nhất
 
 
     private Animator _anim;
@@ -21,8 +20,11 @@ public class ChestInteraction : NetworkBehaviour
     private void Awake()
     {
         EventsManager.Subscribe(EventID.OnReceiveQuestInfo, ReceiveQuestInfo);
+        EventsManager.Subscribe(EventID.OnReturnMenu, SelfDetroy);
         //_listFastestPlayers = new NetworkList<ulong>();
     }
+
+    private void SelfDetroy(object obj) => Destroy(gameObject);
 
     void Start()
     {
@@ -30,10 +32,10 @@ public class ChestInteraction : NetworkBehaviour
         _psSparkle.Play();
     }
 
-    public override void OnDestroy()
+    private void OnDestroy()
     {
-        base.OnDestroy();
         EventsManager.Unsubscribe(EventID.OnReceiveQuestInfo, ReceiveQuestInfo);
+        EventsManager.Unsubscribe(EventID.OnReturnMenu, SelfDetroy);
     }
     private void ReceiveQuestInfo(object obj)
     {
