@@ -395,15 +395,20 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
             changes.ApplyToLobby(_joinedLobby);
 
             //có thằng join
-            if (changes.PlayerJoined.Changed && !_isRelayConnected)
+            if (changes.PlayerJoined.Changed)
             {
                 _isRelayConnected = true;
-                EventsManager.Notify(EventID.OnCheckGameplayState, _joinedLobby);
-                //RelayManager.Instance.JoinRelay(_joinedLobby.Data[KEY_RELAY_CODE].Value);
+                NotifyClientRpc(_joinedLobby);
                 //Debug.Log("Join Relay when lobby changes: ");
             }
             Debug.Log("Lobby changed");
         }
+    }
+
+    [ClientRpc]
+    private void NotifyClientRpc(Lobby joinedLobby)
+    {
+        EventsManager.Notify(EventID.OnCheckGameplayState, joinedLobby);
     }
 
     private void SwitchToMainScene(string content)
