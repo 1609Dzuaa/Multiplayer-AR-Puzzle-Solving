@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PowerupName: Stake
   PowerupIcon: {fileID: 21300000, guid: dcbdacfc26698184e8b31e88c961369d, type: 3}
-  Price: 10
+  Price: 15
   Description: Gains extra points if you solve the riddle in time. Lose a set amount
     of point if you fail the goal.
