@@ -57,11 +57,17 @@ public class RelayManager : BaseSingleton<RelayManager>
                 );
 
             NetworkManager.Singleton.StartClient();
-            LobbyManager.Instance.TweenSwitchScene2();
+            StartCoroutine(DelayNoti());
         }
         catch (RelayServiceException ex)
         {
             Debug.LogException(ex);
         }
+    }
+
+    private IEnumerator DelayNoti()
+    {
+        yield return new WaitForSeconds(0.5f);
+        LobbyManager.Instance.TweenSwitchScene2();
     }
 }
