@@ -458,7 +458,9 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     [ServerRpc]
     private void UpdateLobbyInfoServerRpc(ulong clientId)
     {
+        Debug.Log("Notistart0");
         NotifyStartGameClientRpc(clientId, _lobbyInfo);
+        Debug.Log("Notistart1");
     }
 
     [ClientRpc]
