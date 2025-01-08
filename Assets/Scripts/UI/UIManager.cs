@@ -156,12 +156,13 @@ public class UIManager : BaseSingleton<UIManager>
 
     private void CheckGameplayState(object obj)
     {
-        Lobby lobbyJoined = (Lobby)obj;
+        //Lobby lobbyJoined = (Lobby)obj;
+        LobbyInfo info = (LobbyInfo)obj;
 
         //chỉ unlock khi đủ ng chơi
-        if (lobbyJoined != null)
+        //if (lobbyJoined != null)
         {
-            if (lobbyJoined.Players.Count >= DEFAULT_TOTAL_PLAYER_TO_PLAY)
+            if (/*lobbyJoined.Players.Count*/info.NumPlayerInLobby >= DEFAULT_TOTAL_PLAYER_TO_PLAY)
             {
                 if (_dictPopups[EPopupID.PopupInformation].activeInHierarchy)
                 {
@@ -183,7 +184,7 @@ public class UIManager : BaseSingleton<UIManager>
             }
             else
             {
-                PopupLockGameplay(lobbyJoined);
+                PopupLockGameplay(info);
             }
         }
 
@@ -203,9 +204,9 @@ public class UIManager : BaseSingleton<UIManager>
             //TogglePopup(EPopupID.PopupInformation, false);
     }
 
-    private void PopupLockGameplay(Lobby lobby)
+    private void PopupLockGameplay(LobbyInfo lobby)
     {
-        string content = "Waiting for other players, current: " + lobby.Players.Count + "/" + lobby.MaxPlayers;
+        string content = "Waiting for other players, current: " + lobby.NumPlayerInLobby + "/" + lobby.MaxPlayerInLobby;
         NotificationParam param = new NotificationParam(content);
         TogglePopup(EPopupID.PopupInformation, true);
         EventsManager.Notify(EventID.OnReceiveNotiParam, param);

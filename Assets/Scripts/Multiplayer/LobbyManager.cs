@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Collections;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
@@ -11,6 +12,29 @@ using UnityEngine;
 using static GameConst;
 using static GameEnums;
 
+[Serializable]
+public struct LobbyInfo : INetworkSerializable, IEquatable<LobbyInfo>
+{
+    public int NumPlayerInLobby;
+    public int MaxPlayerInLobby;
+
+    public LobbyInfo(int num, int max)
+    {
+        NumPlayerInLobby = num;
+        MaxPlayerInLobby = max;
+    }
+    public void NetworkSerialize<T>(BufferSerializer<T> serializer) where T : IReaderWriter
+    {
+        serializer.SerializeValue(ref NumPlayerInLobby);
+        serializer.SerializeValue(ref MaxPlayerInLobby);
+    }
+    public bool Equals(LobbyInfo other)
+    {
+        return NumPlayerInLobby == other.NumPlayerInLobby
+            && MaxPlayerInLobby == other.MaxPlayerInLobby;
+    }
+}
+
 public class LobbyManager : NetworkSingleton<LobbyManager>
 {
     Lobby _hostLobby, _joinedLobby;
@@ -19,7 +43,8 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     bool _isRelayConnected = false, _startCount = false;
     NetworkList<PlayerData> _listPlayers;
     PlayerData _pData;
-    int _playerIndex = 0;
+    int _playerIndex = 0, _numPlayersInLobby = 0;
+    LobbyInfo _lobbyInfo;
     string _prevLobbyId;
 
     #region Init & Destroy
@@ -241,6 +266,8 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
                 _hostLobby = lobby;
                 _joinedLobby = _hostLobby;
                 _playerIndex = INDEX_OF_HOST;
+                _numPlayersInLobby = 1;
+                _lobbyInfo = new LobbyInfo(1, maxPlayers);
                 RoundManager.Instance.NumOfRounds.Value =  numOfRounds;
                 RoundManager.Instance.RoundTimer.Value = timeLimit;
                 RoundManager.Instance.PrepTimer.Value = timePrep;
@@ -398,7 +425,9 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
             if (changes.PlayerJoined.Changed)
             {
                 _isRelayConnected = true;
-                NotifyClientRpc();
+                _numPlayersInLobby++;
+                _lobbyInfo.NumPlayerInLobby = _numPlayersInLobby;
+                NotifyClientRpc(_lobbyInfo);
                 //Debug.Log("Join Relay when lobby changes: ");
             }
             Debug.Log("Lobby changed");
@@ -406,10 +435,10 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     }
 
     [ClientRpc]
-    private void NotifyClientRpc()
+    private void NotifyClientRpc(LobbyInfo info)
     {
-        Debug.Log("player count: " + _joinedLobby.Players.Count);
-        EventsManager.Notify(EventID.OnCheckGameplayState, _joinedLobby);
+        Debug.Log("player count: " + info.NumPlayerInLobby);
+        EventsManager.Notify(EventID.OnCheckGameplayState, info);
     }
 
     private void SwitchToMainScene(string content)
