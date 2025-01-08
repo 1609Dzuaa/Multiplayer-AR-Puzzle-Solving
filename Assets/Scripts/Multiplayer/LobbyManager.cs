@@ -408,6 +408,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     [ClientRpc]
     private void NotifyClientRpc()
     {
+        Debug.Log("player count: " + _joinedLobby.Players.Count);
         EventsManager.Notify(EventID.OnCheckGameplayState, _joinedLobby);
     }
 
