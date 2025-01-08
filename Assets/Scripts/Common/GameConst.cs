@@ -4,7 +4,7 @@ using UnityEngine;
 
 public static class GameConst
 {
-    public const int DEFAULT_TOTAL_PLAYER_TO_PLAY = 3;
+    public const int DEFAULT_TOTAL_PLAYER_TO_PLAY = 2;
     public const int DEFAULT_MAX_PLAYERS_IN_LOBBY = 5;
     public const int DEFAULT_CURRENT_TOTAL_PLAYER = 1;
     public const int DEFAULT_MAX_PLAYER = 5;
