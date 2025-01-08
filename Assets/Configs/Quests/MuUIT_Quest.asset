@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21ac6ffc261ee7c41830d35ac0e6d50d, type: 3}
   m_Name: MuUIT_Quest
   m_EditorClassIdentifier: 
-  ImageName: Chest_Orange 2
+  ImageName: Chest_Pink
   Hint: The front of an item that K16 was the first academic year honored to receive.
   NextHint: Use to protect an important part of your body.
   Score: 40

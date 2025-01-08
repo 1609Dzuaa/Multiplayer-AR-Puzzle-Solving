@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 21ac6ffc261ee7c41830d35ac0e6d50d, type: 3}
   m_Name: DuUIT_Quest
   m_EditorClassIdentifier: 
-  ImageName: Chest_Orange 3
+  ImageName: Chest_Purple
   Hint: One of the gifts from OEP presented to K16 students, equipped with a button.
   NextHint: Useful when it's raining.
   Score: 60
