@@ -398,7 +398,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
             if (changes.PlayerJoined.Changed)
             {
                 _isRelayConnected = true;
-                NotifyClientRpc(_joinedLobby);
+                NotifyClientRpc();
                 //Debug.Log("Join Relay when lobby changes: ");
             }
             Debug.Log("Lobby changed");
@@ -406,9 +406,9 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     }
 
     [ClientRpc]
-    private void NotifyClientRpc(Lobby joinedLobby)
+    private void NotifyClientRpc()
     {
-        EventsManager.Notify(EventID.OnCheckGameplayState, joinedLobby);
+        EventsManager.Notify(EventID.OnCheckGameplayState, _joinedLobby);
     }
 
     private void SwitchToMainScene(string content)
