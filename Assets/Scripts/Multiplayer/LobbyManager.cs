@@ -477,7 +477,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     public void TweenSwitchScene2()
     {
         UIManager.Instance.TogglePopup(EPopupID.PopupLobby, false);
-        if (IsOwner)
+        //if (IsOwner)
         {
             UpdateLobbyInfoServerRpc();
             Debug.Log("owner call svrpc");

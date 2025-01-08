@@ -67,7 +67,7 @@ public class RelayManager : BaseSingleton<RelayManager>
 
     private IEnumerator DelayNoti()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1f);
         LobbyManager.Instance.TweenSwitchScene2();
     }
 }
