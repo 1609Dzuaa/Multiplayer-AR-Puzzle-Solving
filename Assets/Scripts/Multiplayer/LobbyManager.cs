@@ -456,15 +456,15 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void UpdateLobbyInfoServerRpc(ulong clientId)
+    private void UpdateLobbyInfoServerRpc()
     {
         Debug.Log("Notistart0");
-        NotifyStartGameClientRpc(clientId, _lobbyInfo);
+        NotifyStartGameClientRpc(_lobbyInfo);
         Debug.Log("Notistart1");
     }
 
     [ClientRpc]
-    void NotifyStartGameClientRpc(ulong clientId, LobbyInfo info)
+    void NotifyStartGameClientRpc(LobbyInfo info)
     {
         //if (NetworkManager.Singleton.LocalClientId == clientId)
         //{
@@ -477,7 +477,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     private void TweenSwitchScene2()
     {
         UIManager.Instance.TogglePopup(EPopupID.PopupLobby, false);
-        UpdateLobbyInfoServerRpc(NetworkManager.Singleton.LocalClientId);
+        UpdateLobbyInfoServerRpc();
         Debug.Log("LobbyInfo after SvRpc: " + _lobbyInfo.NumPlayerInLobby);
         //EventsManager.Notify(EventID.OnStartGame, _lobbyInfo);
     }
