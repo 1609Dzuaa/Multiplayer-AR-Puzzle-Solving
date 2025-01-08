@@ -395,10 +395,10 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
 
     private void UpdatePlayer(PlayerData data, int playerIndex)
     {
-        //Debug.Log("player, index: " + data.Name + ", " + playerIndex);
+        Debug.Log("player, index: " + data.Name + ", " + playerIndex);
         _listPlayers[playerIndex] = data;
-        //foreach (var player in _listPlayers)
-            //Debug.Log("name, score: " + player.Name + ", " + player.Score);
+        foreach (var player in _listPlayers)
+            Debug.Log("name, score: " + player.Name + ", " + player.Score);
     }
 
     private void PopupWinner()
@@ -456,34 +456,32 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     }
 
     [ServerRpc(RequireOwnership = false)]
-    private void UpdateLobbyInfoServerRpc()
+    private void UpdateLobbyInfoServerRpc(ulong clientId)
     {
-        Debug.Log("Notistart0");
-        NotifyStartGameClientRpc(_lobbyInfo);
-        Debug.Log("Notistart1");
+        //Debug.Log("Notistart0");
+        NotifyStartGameClientRpc(_lobbyInfo, clientId);
+        //Debug.Log("Notistart1");
     }
 
     [ClientRpc]
-    void NotifyStartGameClientRpc(LobbyInfo info)
+    void NotifyStartGameClientRpc(LobbyInfo info, ulong clientId)
     {
-        //if (NetworkManager.Singleton.LocalClientId == clientId)
-        //{
+        if (NetworkManager.Singleton.LocalClientId == clientId)
+        {
             Debug.Log("Notistart");
             EventsManager.Notify(EventID.OnStartGame, info);
-        //}
+        }
     }
 
     //dc goi o client
     public void TweenSwitchScene2()
     {
         UIManager.Instance.TogglePopup(EPopupID.PopupLobby, false);
-        //if (IsOwner)
         {
-            UpdateLobbyInfoServerRpc();
+            UpdateLobbyInfoServerRpc(NetworkManager.Singleton.LocalClientId);
             Debug.Log("owner call svrpc");
         }
         Debug.Log("LobbyInfo after SvRpc: " + _lobbyInfo.NumPlayerInLobby);
-        //EventsManager.Notify(EventID.OnStartGame, _lobbyInfo);
     }
 
     public void CreateALobby(string lobbyName, int maxPlayers, int numOfRounds, int timeLimit, int timePrep)
