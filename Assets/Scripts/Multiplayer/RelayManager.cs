@@ -57,6 +57,7 @@ public class RelayManager : BaseSingleton<RelayManager>
                 );
 
             NetworkManager.Singleton.StartClient();
+            LobbyManager.Instance.TweenSwitchScene2();
         }
         catch (RelayServiceException ex)
         {

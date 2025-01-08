@@ -474,10 +474,14 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     }
 
     //dc goi o client
-    private void TweenSwitchScene2()
+    public void TweenSwitchScene2()
     {
         UIManager.Instance.TogglePopup(EPopupID.PopupLobby, false);
-        UpdateLobbyInfoServerRpc();
+        if (IsOwner)
+        {
+            UpdateLobbyInfoServerRpc();
+            Debug.Log("owner call svrpc");
+        }
         Debug.Log("LobbyInfo after SvRpc: " + _lobbyInfo.NumPlayerInLobby);
         //EventsManager.Notify(EventID.OnStartGame, _lobbyInfo);
     }
@@ -516,7 +520,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
             _joinedLobby = lobby;
             RelayManager.Instance.JoinRelay(_joinedLobby.Data[KEY_RELAY_CODE].Value);
 
-            TweenSwitchScene2();
+            //TweenSwitchScene2();
             if (String.IsNullOrEmpty(_prevLobbyId))
                 _prevLobbyId = lobbyID;
             //TweenSwitchScene();
