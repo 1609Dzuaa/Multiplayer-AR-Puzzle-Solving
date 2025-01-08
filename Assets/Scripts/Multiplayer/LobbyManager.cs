@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
 using Unity.Netcode;
 using Unity.Services.Authentication;
 using Unity.Services.Core;
@@ -191,22 +190,31 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
 
     #endregion
 
+    private void ToggleConfigRoomAgain()
+    {
+        UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false);
+        UIManager.Instance.TogglePopup(EPopupID.PopupConfigRoom, true);
+    }
+
     private async void CreateLobby(string lobbyName, int maxPlayers, int numOfRounds, int timeLimit, int timePrep)
     {
         if (String.IsNullOrEmpty(lobbyName))
         {
             string content = "Lobby Name Is Empty";
-            ShowNotification.Show(content);
+            UIManager.Instance.TogglePopup(EPopupID.PopupConfigRoom, false);
+            ShowNotification.Show(content, ToggleConfigRoomAgain);
         }
         else if (maxPlayers < DEFAULT_TOTAL_PLAYER_TO_PLAY)
         {
             string content = "Cannot create a room under 3 players!";
-            ShowNotification.Show(content);
+            UIManager.Instance.TogglePopup(EPopupID.PopupConfigRoom, false);
+            ShowNotification.Show(content, ToggleConfigRoomAgain);
         }
         else if (maxPlayers > DEFAULT_MAX_PLAYER)
         {
             string content = "Cannot create a room over 5 players!";
-            ShowNotification.Show(content);
+            UIManager.Instance.TogglePopup(EPopupID.PopupConfigRoom, false);
+            ShowNotification.Show(content, ToggleConfigRoomAgain);
         }
         else
         {
@@ -392,7 +400,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
                 //RelayManager.Instance.JoinRelay(_joinedLobby.Data[KEY_RELAY_CODE].Value);
                 //Debug.Log("Join Relay when lobby changes: ");
             }
-            //Debug.Log("Lobby changed");
+            Debug.Log("Lobby changed");
         }
     }
 
@@ -557,20 +565,73 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
             LeaveALobby();
     }
 
-    public async void CreateNameInLobby(string playerName)
+    [ServerRpc(RequireOwnership = false)]
+    private void RequestCreateNameServerRpc(string playerName, string playerKey, ulong clientId)
     {
-        string keyName = AuthenticationService.Instance.PlayerId;
+        foreach (var p in _joinedLobby.Players)
+            Debug.Log("playerKEYPLAERNAME: " + p.Data[KEY_PLAYER_NAME].Value);
 
         Player player = _joinedLobby.Players.Find(x => x.Data[KEY_PLAYER_NAME].Value == playerName);
 
         if (player != null)
         {
-            string content = "The name " + playerName + " is already exist in Lobby, choose another name!";
-            NotificationParam param = new NotificationParam(content, () => { UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false); });
-            EventsManager.Notify(EventID.OnReceiveNotiParam, param);
+            //false
+            CreateNameClientRpc(clientId, false, playerName);
+            Debug.Log("found a player with name " + playerName);
             return;
         }
 
+        //success
+        TryCreateNameClientRpc(playerName, playerKey, clientId);
+        //CreateNameClientRpc(clientId, true);
+    }
+
+    [ClientRpc]
+    private void CreateNameClientRpc(ulong clientId, bool isSuccess, string playerName)
+    {
+        if (NetworkManager.Singleton.LocalClientId == clientId)
+        {
+            if (isSuccess)
+            {
+                UIManager.Instance.TogglePopup(EPopupID.PopupEnterName, false);
+                string content = "Waiting for other players...";
+                ShowNotification.Show(content);
+                _pData = new PlayerData(playerName, DEFAULT_SCORE);
+                Debug.Log("client send data to sv, name: " + playerName);
+                SendPlayerDataServerRpc(_pData, NetworkManager.Singleton.LocalClientId);
+            }
+            else
+            {
+                string content = "The name is already exist in Lobby, choose another name!";
+                NotificationParam param = new NotificationParam(content, ToggleEnterNameAgain);
+                EventsManager.Notify(EventID.OnReceiveNotiParam, param);
+                UIManager.Instance.TogglePopup(EPopupID.PopupEnterName, false);
+                UIManager.Instance.TogglePopup(EPopupID.PopupInformation, true);
+            }
+        }
+        else
+            Debug.Log("client not match Id");
+    }
+
+    private void ToggleEnterNameAgain()
+    {
+        UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false);
+        UIManager.Instance.TogglePopup(EPopupID.PopupEnterName, true);
+    }
+
+    [ClientRpc]
+    private void TryCreateNameClientRpc(string playerName, string keyName, ulong clientId)
+    {
+        if (keyName != AuthenticationService.Instance.PlayerId) 
+            return;
+
+        Debug.Log("TryCreateNameClientRpc");
+
+        TryCreateName(playerName, keyName, clientId);
+    }
+
+    private async void TryCreateName(string playerName, string keyName, ulong clientId)
+    {
         UpdatePlayerOptions playerOptions = new UpdatePlayerOptions
         {
             Data = new Dictionary<string, PlayerDataObject>
@@ -585,41 +646,47 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
 
             if (updatedLobby != null)
             {
-                /*string successMessage = "Your name has been updated successfully!";
-                NotificationParam successParam = new NotificationParam(successMessage, () => { UIManager.Instance.TogglePopup(EPopupID.PopupInformation, false); });
-                EventsManager.Notify(EventID.OnReceiveNotiParam, successParam);*/
-
                 _pData = new PlayerData(playerName, DEFAULT_SCORE);
 
                 //tạo đc tên thì bắn event cho chơi
                 //kèm data người chơi này
                 //EventsManager.Notify(EventID.OnCanPlay, pData);
-                UIManager.Instance.TogglePopup(EPopupID.PopupEnterName, false);
+                /*UIManager.Instance.TogglePopup(EPopupID.PopupEnterName, false);
                 string content = "Waiting for other players...";
                 ShowNotification.Show(content);
 
+                SendPlayerDataServerRpc(_pData, NetworkManager.Singleton.LocalClientId);*/
+                _joinedLobby = updatedLobby;
+                //CreateNameClientRpc(clientId, true, playerName);
+                UIManager.Instance.TogglePopup(EPopupID.PopupEnterName, false);
+                string content = "Waiting for other players...";
+                ShowNotification.Show(content);
+                _pData = new PlayerData(playerName, DEFAULT_SCORE);
+                Debug.Log("client send data to sv, name: " + playerName);
                 SendPlayerDataServerRpc(_pData, NetworkManager.Singleton.LocalClientId);
 
-                //dựa vào là host hay client để gửi data và đánh index cho player
-                /*if (IsHost) //problem with owner
-                {
-                    SendPlayerDataServerRpc(_pData, NetworkManager.Singleton.LocalClientId);
-                    Debug.Log("server send data SvRpc");
-                }
-                else if (IsClient && IsOwner)
-                {
-                    SendPlayerDataServerRpc(_pData, NetworkManager.Singleton.LocalClientId);
-                    Debug.Log("client send data SvRpc");
-                }*/
-                _joinedLobby = updatedLobby;
-
-                //foreach (var p in _joinedLobby.Players)
-                    //Debug.Log("Lobby " + _joinedLobby.Name + ", Player: " + p.Data[KEY_PLAYER_NAME].Value);
+                foreach (var p in _joinedLobby.Players)
+                    Debug.Log("Lobby " + _joinedLobby.Name + ", Player: " + p.Data[KEY_PLAYER_NAME].Value);
             }
         }
         catch (LobbyServiceException ex)
         {
             Debug.Log(ex);
+        }
+    }
+
+    public void CreateNameInLobby(string playerName)
+    {
+        string keyName = AuthenticationService.Instance.PlayerId;
+        if (IsHost)
+        {
+            RequestCreateNameServerRpc(playerName, keyName, NetworkManager.Singleton.LocalClientId);
+            Debug.Log("host create name");
+        }
+        else
+        {
+            Debug.Log("isowner client");
+            RequestCreateNameServerRpc(playerName, keyName, NetworkManager.Singleton.LocalClientId);
         }
     }
 

@@ -24,13 +24,13 @@ public class PopupConfigRoom : PopupController
             case BUTTON_CONFIRM:
                 //xài tmp_input field gặp bug
                 //https://discussions.unity.com/t/cannot-convert-inputfield-to-int/807904/12
-                string inputName = _txtName.text;
+                string inputName = _txtName.text.Replace("\u200B", "");
                 string totalPlayer = _txtTotalPlayer.text.Replace("\u200B", "");
                 int maxPlayers;
                 if (int.TryParse(totalPlayer.Trim(), out maxPlayers))
                     Debug.Log("Parse success");
                 else
-                    Debug.LogError("Invalid input: totalPlayer is not a valid number");
+                    Debug.Log("Invalid input: totalPlayer is not a valid number");
 
                 int indexDropdown = _dropdownTimeLimit.value;
                 string selectedOption = _dropdownTimeLimit.options[indexDropdown].text;
@@ -43,7 +43,7 @@ public class PopupConfigRoom : PopupController
                 int indexDropdown2 = _dropdownRound.value;
                 string selectedOption2 = _dropdownRound.options[indexDropdown2].text;
                 int numOfRounds = int.Parse(selectedOption2.Substring(0, 1));
-                Debug.Log("Val Rounds: " + numOfRounds);
+                //Debug.Log("Val Rounds: " + numOfRounds);
 
                 LobbyManager.Instance.CreateALobby(inputName, maxPlayers, numOfRounds, timeLimit, timePrep);
                 break;

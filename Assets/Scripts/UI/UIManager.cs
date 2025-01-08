@@ -213,7 +213,7 @@ public class UIManager : BaseSingleton<UIManager>
 
     public void TogglePopup(EPopupID id, bool On)
     {
-        //if (_dictPopups[id].activeInHierarchy && On) return;
+        if (_dictPopups[id].activeInHierarchy && On) return;
 
         //Maybe need to re-order render here
         if (On)
@@ -235,7 +235,7 @@ public class UIManager : BaseSingleton<UIManager>
         }
 
         //Debug.Log("id: " + id);
-        _dimmedBG.gameObject.SetActive((_stackPopupOrder.Count > 0) ? true : On);
+        _dimmedBG.gameObject.SetActive(_stackPopupOrder.Count > 0);
     }
 
     public void HideAllCurrentPopups()
