@@ -218,6 +218,8 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         }
         else
         {
+            UIManager.Instance.TogglePopup(EPopupID.PopupConfigRoom, false);
+            UIManager.Instance.TogglePopup(EPopupID.PopupWaiting, true);
             string defaultName = "UIT";
             try
             {
@@ -239,9 +241,9 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
                 _hostLobby = lobby;
                 _joinedLobby = _hostLobby;
                 _playerIndex = INDEX_OF_HOST;
-                RoundManager.Instance.NumOfRounds.Value = 1;// numOfRounds;
-                RoundManager.Instance.RoundTimer.Value = 20;
-                RoundManager.Instance.PrepTimer.Value = 15;//timePrep;
+                RoundManager.Instance.NumOfRounds.Value =  numOfRounds;
+                RoundManager.Instance.RoundTimer.Value = timeLimit;
+                RoundManager.Instance.PrepTimer.Value = timePrep;
 
                 try
                 {
