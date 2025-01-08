@@ -455,7 +455,7 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
         EventsManager.Notify(EventID.OnStartGame, _lobbyInfo);
     }
 
-    [ServerRpc]
+    [ServerRpc(RequireOwnership = false)]
     private void UpdateLobbyInfoServerRpc(ulong clientId)
     {
         Debug.Log("Notistart0");
@@ -467,10 +467,10 @@ public class LobbyManager : NetworkSingleton<LobbyManager>
     void NotifyStartGameClientRpc(ulong clientId, LobbyInfo info)
     {
         //if (NetworkManager.Singleton.LocalClientId == clientId)
-        {
+        //{
             Debug.Log("Notistart");
             EventsManager.Notify(EventID.OnStartGame, info);
-        }
+        //}
     }
 
     //dc goi o client
